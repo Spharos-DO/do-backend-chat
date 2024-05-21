@@ -1,4 +1,4 @@
-package hobbiedo.base.exception;
+package hobbiedo.global.base.exception;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.reactive.result.method.annotation.ResponseEntityExceptionHandler;
 
-import hobbiedo.base.ApiResponse;
-import hobbiedo.base.code.status.ErrorStatus;
-import hobbiedo.base.dto.ErrorReasonDto;
+import hobbiedo.global.base.ApiResponse;
+import hobbiedo.global.base.code.status.ErrorStatus;
+import hobbiedo.global.base.dto.ErrorReasonDto;
 import lombok.extern.slf4j.Slf4j;
 
 @RestControllerAdvice

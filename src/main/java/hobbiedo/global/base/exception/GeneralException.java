@@ -1,7 +1,7 @@
-package hobbiedo.base.exception;
+package hobbiedo.global.base.exception;
 
-import hobbiedo.base.code.BaseErrorCode;
-import hobbiedo.base.dto.ErrorReasonDto;
+import hobbiedo.global.base.code.BaseErrorCode;
+import hobbiedo.global.base.dto.ErrorReasonDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

@@ -1,5 +1,5 @@
-package hobbiedo.base.code;
-import hobbiedo.base.dto.ErrorReasonDto;
+package hobbiedo.global.base.code;
+import hobbiedo.global.base.dto.ErrorReasonDto;
 
 public interface BaseErrorCode {
     ErrorReasonDto getReason();
