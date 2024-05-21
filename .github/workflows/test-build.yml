@@ -2,15 +2,10 @@ name: Build Test
 
 on:
   push:
-<<<<<<< HEAD
-    branches: [ "main","dev" ]
-  pull_request:
-    branches: [ "main","dev" ]
-=======
     branches: [ "main","develop" ]
   pull_request:
     branches: [ "main","develop" ]
->>>>>>> f1144a9 (init: issue, PR templete 과 test-build.yml 적용)
+
 
 jobs:
   build:
