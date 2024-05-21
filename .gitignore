@@ -1,48 +1,37 @@
-HEHELP.md
-.gradle
-build/
-!gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-bin/
-!**/src/main/**/bin/
-!**/src/test/**/bin/
-
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-out/
-!**/src/main/**/out/
-!**/src/test/**/out/
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-
-### VS Code ###
-.vscode/
-
-### property files ###
-**/application.yml
-**/application-local.yml
-**/application-prod.yml
-
-### .DS_store ###
+# Default ignored files
+/shelf/
+/.idea/workspace.xml
+# Editor-based HTTP Client requests
+/httpRequests/
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
+### Java template
+*.class
+#PackageFiles
+*.jar
+*.war
+*.ear
+###macOStemplate
 .DS_Store
 ._.DS_Store
 **/.DS_Store
 **/._.DS_Store
+.AppleDouble
+.LSOverride
+#IntelliJprojectfiles
+.idea
+.idea/*.xml
+*.iml
+out
+gen
+build
+rebel.xml
+#Compliledfiles
+/target/
+**/target
+/example/
+#Gradle
+.gradle
+/build/
+.gradletasknamecache
