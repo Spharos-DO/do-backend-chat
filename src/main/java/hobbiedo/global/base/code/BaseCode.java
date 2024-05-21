@@ -1,6 +1,6 @@
-package hobbiedo.base.code;
+package hobbiedo.global.base.code;
 
-import hobbiedo.base.dto.ReasonDto;
+import hobbiedo.global.base.dto.ReasonDto;
 
 public interface BaseCode {
 	ReasonDto getReason();

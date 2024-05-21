@@ -1,4 +1,4 @@
-package hobbiedo.base;
+package hobbiedo.global.base;
 
 import org.springframework.http.HttpStatus;
 
@@ -6,8 +6,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-import hobbiedo.base.code.BaseCode;
-import hobbiedo.base.code.BaseErrorCode;
+import hobbiedo.global.base.code.BaseCode;
+import hobbiedo.global.base.code.BaseErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
