@@ -1,6 +1,7 @@
 package hobbiedo.global.exception.handler;
 
-import hobbiedo.global.code.BaseErrorCode;
+
+import hobbiedo.global.base.code.BaseErrorCode;
 import hobbiedo.global.exception.GeneralException;
 
 public class ExampleHandler extends GeneralException {
@@ -8,3 +9,4 @@ public class ExampleHandler extends GeneralException {
 		super(errorCode);
 	}
 }
+
