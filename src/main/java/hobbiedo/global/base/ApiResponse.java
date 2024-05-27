@@ -10,6 +10,7 @@ import hobbiedo.global.base.code.BaseErrorCode;
 import hobbiedo.global.base.code.status.SuccessStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import reactor.core.publisher.Mono;
 
 @JsonPropertyOrder({"isSuccess", "status", "message", "data"})
 @Getter
@@ -44,6 +45,18 @@ public class ApiResponse<T> {
 			errorCode.getReasonHttpStatus().getCode(),
 			errorCode.getReasonHttpStatus().getMessage(),
 			data);
+	}
+
+	public static <T> Mono<ApiResponse<T>> onSuccessMono(SuccessStatus code, T data) {
+		return Mono.just(onSuccess(code, data));
+	}
+
+	public static <T> Mono<ApiResponse<T>> onFailureMono(String status, String message, T data) {
+		return Mono.just(onFailure(status, message, data));
+	}
+
+	public static <T> Mono<ApiResponse<T>> onFailureMono(BaseErrorCode errorCode, T data) {
+		return Mono.just(onFailure(errorCode, data));
 	}
 
 }
