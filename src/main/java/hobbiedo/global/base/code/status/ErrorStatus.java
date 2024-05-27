@@ -1,16 +1,18 @@
-package hobbiedo.global.code.status;
+package hobbiedo.global.base.code.status;
 
 import org.springframework.http.HttpStatus;
 
-import hobbiedo.global.code.BaseErrorCode;
-import hobbiedo.global.dto.ErrorReasonDto;
+import hobbiedo.global.base.code.BaseErrorCode;
+import hobbiedo.global.base.dto.ErrorReasonDTO;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
 public enum ErrorStatus implements BaseErrorCode {
-	VALID_EXCEPTION(HttpStatus.BAD_REQUEST, "GLOBAL400", "데이터베이스 유효성 에러");
+	VALID_EXCEPTION(HttpStatus.BAD_REQUEST, "GLOBAL400", "데이터베이스 유효성 에러"),
+
+	NO_EXIST_CHAT(HttpStatus.NOT_FOUND, "CHAT401", "조회 가능한 채팅이 존재하지 않습니다.");
 
 	private final HttpStatus httpStatus;
 	private final String status;
@@ -25,21 +27,21 @@ public enum ErrorStatus implements BaseErrorCode {
 	 * 5. API 설계의 일관성: 오류 처리를 통합하여 여러 다른 API에서 일관된 방식으로 오류를 보고하고 싶을 때 유용
 	 */
 	@Override
-	public ErrorReasonDto getReason() {
-		return ErrorReasonDto
-				.builder()
-				.code(status)
-				.message(message)
-				.build();
+	public ErrorReasonDTO getReason() {
+		return ErrorReasonDTO
+			.builder()
+			.code(status)
+			.message(message)
+			.build();
 	}
 
 	@Override
-	public ErrorReasonDto getReasonHttpStatus() {
-		return ErrorReasonDto
-				.builder()
-				.httpStatus(httpStatus)
-				.code(status)
-				.message(message)
-				.build();
+	public ErrorReasonDTO getReasonHttpStatus() {
+		return ErrorReasonDTO
+			.builder()
+			.httpStatus(httpStatus)
+			.code(status)
+			.message(message)
+			.build();
 	}
 }

@@ -1,7 +1,8 @@
 package hobbiedo.global.exception;
 
-import hobbiedo.global.code.BaseErrorCode;
-import hobbiedo.global.dto.ErrorReasonDto;
+
+import hobbiedo.global.base.code.BaseErrorCode;
+import hobbiedo.global.base.dto.ErrorReasonDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -10,11 +11,11 @@ import lombok.Getter;
 public class GeneralException extends RuntimeException {
 	private BaseErrorCode errorCode;
 
-	public ErrorReasonDto getErrorReason() {
+	public ErrorReasonDTO getErrorReason() {
 		return errorCode.getReason();
 	}
 
-	public ErrorReasonDto getErrorReasonHttpStatus() {
+	public ErrorReasonDTO getErrorReasonHttpStatus() {
 		return errorCode.getReasonHttpStatus();
 	}
 }
