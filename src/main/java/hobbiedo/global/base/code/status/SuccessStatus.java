@@ -1,20 +1,15 @@
-package hobbiedo.global.code.status;
+package hobbiedo.global.base.code.status;
 
-import org.springframework.http.HttpStatus;
-
-import hobbiedo.global.code.BaseCode;
-import hobbiedo.global.dto.ReasonDto;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum SuccessStatus implements BaseCode {
+public enum SuccessStatus {
 
-	CREATE_REGION(HttpStatus.OK, "REGION200", "활동 지역을 등록에 성공하였습니다.");
+	FIND_CHAT_CONTENT("채팅 내용 조회에 성공하였습니다."),
+	CREATE_CHAT("새로운 채팅이 생성되었습니다.");
 
-	private final HttpStatus httpStatus;
-	private final String status;
 	private final String message;
 
 	/**
@@ -25,22 +20,22 @@ public enum SuccessStatus implements BaseCode {
 	 * 4. 성능 최적화: 성능이 중요한 환경에서는 가능한 한 응답을 간단하게 유지하여 이러한 오버헤드를 최소화
 	 * 5. API 설계의 일관성: 오류 처리를 통합하여 여러 다른 API에서 일관된 방식으로 오류를 보고하고 싶을 때 유용
 	 */
-	@Override
-	public ReasonDto getReason() {
-		return ReasonDto
-				.builder()
-				.code(status)
-				.message(message)
-				.build();
-	}
-
-	@Override
-	public ReasonDto getReasonHttpStatus() {
-		return ReasonDto
-				.builder()
-				.httpStatus(httpStatus)
-				.code(status)
-				.message(message)
-				.build();
-	}
+	// @Override
+	// public ReasonDTO getReason() {
+	// 	return ReasonDTO
+	// 		.builder()
+	// 		.code(status)
+	// 		.message(message)
+	// 		.build();
+	// }
+	//
+	// @Override
+	// public ReasonDTO getReasonHttpStatus() {
+	// 	return ReasonDTO
+	// 		.builder()
+	// 		.httpStatus(httpStatus)
+	// 		.code(status)
+	// 		.message(message)
+	// 		.build();
+	// }
 }
