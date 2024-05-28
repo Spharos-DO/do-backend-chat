@@ -8,6 +8,7 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.servers.Server;
 
 @Configuration
 public class SwaggerConfig {
@@ -17,10 +18,14 @@ public class SwaggerConfig {
 
 	@Bean
 	public OpenAPI openApi() {
-		return new OpenAPI().components(new Components())
+		return new OpenAPI()
+			.components(new Components())
 			.addSecurityItem(new SecurityRequirement().addList(BEARER_TOKEN))
-			.components(new Components().addSecuritySchemes(BEARER_TOKEN,
-				new SecurityScheme().name(BEARER_TOKEN)
+			.addServersItem(new Server().url("/"))
+			.addServersItem(new Server().url("/chat-service"))
+			.components(new io.swagger.v3.oas.models.Components()
+				.addSecuritySchemes(BEARER_TOKEN, new SecurityScheme()
+					.name(BEARER_TOKEN)
 					.type(SecurityScheme.Type.HTTP)
 					.scheme(BEARER_SCHEME)
 					.bearerFormat(BEARER_FORMAT)))

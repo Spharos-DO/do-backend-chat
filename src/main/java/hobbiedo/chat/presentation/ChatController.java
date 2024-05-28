@@ -1,5 +1,7 @@
 package hobbiedo.chat.presentation;
 
+import java.time.LocalDateTime;
+
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,11 +34,18 @@ public class ChatController {
 			.map(chat -> ApiResponse.onSuccess(SuccessStatus.CREATE_CHAT, chat));
 	}
 
+	// @GetMapping(value = "/{crewId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	// public Flux<ApiResponse<Chat>> getChatByRoomId(@PathVariable String crewId) {
+	// 	return chatService.getChatByCrewId(crewId)
+	// 		.map(chat -> ApiResponse.onSuccess(SuccessStatus.FIND_CHAT_CONTENT, chat))
+	// 		.subscribeOn(Schedulers.boundedElastic());
+	// }
+
 	@GetMapping(value = "/{crewId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public Flux<ApiResponse<Chat>> getChatByRoomId(@PathVariable String crewId) {
-		return chatService.getChatByCrewId(crewId)
+		LocalDateTime since = LocalDateTime.now();
+		return chatService.getChatByCrewIdAfterDateTime(crewId, since)
 			.map(chat -> ApiResponse.onSuccess(SuccessStatus.FIND_CHAT_CONTENT, chat))
 			.subscribeOn(Schedulers.boundedElastic());
 	}
-
 }

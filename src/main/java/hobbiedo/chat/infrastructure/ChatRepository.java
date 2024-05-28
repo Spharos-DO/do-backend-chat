@@ -13,4 +13,8 @@ public interface ChatRepository extends ReactiveMongoRepository<Chat, String> {
 	@Tailable
 	@Query(value = "{ 'crewId' : ?0 }", fields = "{ 'id': 0, 'crewId': 0 }")
 	Flux<Chat> findChatByCrewId(String crewId);
+
+	@Tailable
+	@Query("{ 'crewId' : ?0, 'createdAt' : { $gt: ?1 } }")
+	Flux<Chat> findChatByCrewIdAndCreatedAtAfter(String crewId, LocalDateTime since);
 }
