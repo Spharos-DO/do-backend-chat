@@ -27,7 +27,8 @@ public class Chat {
 	private LocalDateTime createdAt;
 
 	@Builder
-	public Chat(String id, String crewId, String uuid, String text, String imageUrl, String videoUrl,
+	public Chat(String id, String crewId, String uuid, String text, String imageUrl,
+		String videoUrl,
 		String entryExitNotice, LocalDateTime createdAt) {
 		this.id = id;
 		this.crewId = crewId;

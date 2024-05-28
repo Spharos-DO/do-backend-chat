@@ -31,13 +31,8 @@ public class ChatServiceImp implements ChatService {
 	}
 
 	@Override
-	public Flux<Chat> getChatByCrewId(String crewId) {
-		return chatRepository.findChatByCrewId(crewId);
-
-	}
-
-	@Override
 	public Flux<Chat> getChatByCrewIdAfterDateTime(String crewId, LocalDateTime since) {
+
 		return chatRepository.findChatByCrewIdAndCreatedAtAfter(crewId, since);
 	}
 }

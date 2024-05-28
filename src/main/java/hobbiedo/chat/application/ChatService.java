@@ -11,7 +11,5 @@ public interface ChatService {
 
 	Mono<Chat> sendChat(ChatSendVo chatSendVo, String uuid);
 
-	Flux<Chat> getChatByCrewId(String crewId);
-
 	Flux<Chat> getChatByCrewIdAfterDateTime(String crewId, LocalDateTime since);
 }

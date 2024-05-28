@@ -17,6 +17,7 @@ import hobbiedo.chat.vo.request.ChatSendVo;
 import hobbiedo.global.base.ApiResponse;
 import hobbiedo.global.base.code.status.SuccessStatus;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -24,6 +25,7 @@ import reactor.core.scheduler.Schedulers;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/v1/users/chat")
+@Slf4j
 public class ChatController {
 	private final ChatService chatService;
 
@@ -33,13 +35,6 @@ public class ChatController {
 		return chatService.sendChat(chatSendVo, uuid)
 			.map(chat -> ApiResponse.onSuccess(SuccessStatus.CREATE_CHAT, chat));
 	}
-
-	// @GetMapping(value = "/{crewId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	// public Flux<ApiResponse<Chat>> getChatByRoomId(@PathVariable String crewId) {
-	// 	return chatService.getChatByCrewId(crewId)
-	// 		.map(chat -> ApiResponse.onSuccess(SuccessStatus.FIND_CHAT_CONTENT, chat))
-	// 		.subscribeOn(Schedulers.boundedElastic());
-	// }
 
 	@GetMapping(value = "/{crewId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public Flux<ApiResponse<Chat>> getChatByRoomId(@PathVariable String crewId) {
