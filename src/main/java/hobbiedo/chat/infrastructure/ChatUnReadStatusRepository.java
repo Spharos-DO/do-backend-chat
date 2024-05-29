@@ -9,7 +9,7 @@ import reactor.core.publisher.Mono;
 public interface ChatUnReadStatusRepository
 	extends ReactiveMongoRepository<ChatUnReadStatus, String> {
 
-	@Query(value = "{ 'uuid': ?0, 'crewId': ?1 }", fields = "{ 'lastAt': 1 }")
+	@Query(value = "{ 'uuid': ?0, 'crewId': ?1 }", fields = "{ 'lastReadAt': 1 }")
 	Mono<ChatUnReadStatus> findByUuidAndCrewId(String uuid, Long crewId);
 
 }
