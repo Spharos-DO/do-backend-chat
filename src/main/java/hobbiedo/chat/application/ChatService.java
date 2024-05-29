@@ -11,8 +11,5 @@ public interface ChatService {
 
 	Mono<Chat> sendChat(ChatSendVo chatSendVo, String uuid);
 
-	//Flux<Chat> getChatByCrewIdAfterDateTime(Long crewId, LocalDateTime since);
-	//Flux<Chat> getStreamChatByCrewId(Long crewId);
-
-	Flux<Chat> getChatByCrewIdAfterDateTime(Long crewId, Instant since);
+	Flux<Chat> getChatByCrewIdAfterDateTime(Long crewId, String uuid);
 }

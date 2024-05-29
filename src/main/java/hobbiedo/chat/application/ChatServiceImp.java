@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import hobbiedo.chat.domain.Chat;
 import hobbiedo.chat.infrastructure.ChatRepository;
+import hobbiedo.chat.infrastructure.ChatUnReadStatusRepository;
 import hobbiedo.chat.vo.request.ChatSendVo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class ChatServiceImp implements ChatService {
 	private final ChatRepository chatRepository;
+	private final ChatUnReadStatusRepository chatUnReadStatusRepository;
 
 	@Override
 	public Mono<Chat> sendChat(ChatSendVo chatSendVo,
@@ -33,13 +35,10 @@ public class ChatServiceImp implements ChatService {
 	}
 
 	@Override
-	public Flux<Chat> getChatByCrewIdAfterDateTime(Long crewId, Instant since) {
-		return chatRepository.findChatByCrewIdAndCreatedAtAfter(crewId, since);
+	public Flux<Chat> getChatByCrewIdAfterDateTime(Long crewId, String uuid) {
+		return chatUnReadStatusRepository.findByUuidAndCrewId(uuid, crewId)
+			.flatMapMany(
+				chatUnReadStatus -> chatRepository.findChatByCrewIdAndCreatedAtOrAfter(crewId,
+					chatUnReadStatus.getLastAt()));
 	}
-
-	// @Override
-	// public Flux<Chat> getStreamChatByCrewId(Long crewId) {
-	//
-	// 	return chatRepository.streamChatByCrewId(crewId);
-	// }
 }

@@ -1,7 +1,5 @@
 package hobbiedo.chat.presentation;
 
-import java.time.Instant;
-
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,7 +7,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import hobbiedo.chat.application.ChatService;
@@ -20,7 +17,6 @@ import hobbiedo.global.base.code.status.SuccessStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -29,7 +25,6 @@ import reactor.core.scheduler.Schedulers;
 @RestController
 @Tag(name = "채팅", description = "Chat API")
 @RequestMapping("/v1/users/chat")
-@Slf4j
 public class ChatController {
 	private final ChatService chatService;
 
@@ -41,19 +36,12 @@ public class ChatController {
 			.map(chat -> ApiResponse.onSuccess(SuccessStatus.CREATE_CHAT, chat));
 	}
 
-	@Operation(summary = "(특정 소모임의) 실시간 채팅 내역 조회", description = "특정 시간(Instant) 이후의 채팅 내역을 실시간으로 조회한다.")
+	@Operation(summary = "(특정 소모임의) 실시간 채팅 내역 조회", description = "특정 시간(Instant)과 그 이후의 채팅 내역을 실시간으로 조회한다.")
 	@GetMapping(value = "/{crewId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	public Flux<ApiResponse<Chat>> getChatByRoomId(@PathVariable Long crewId, @RequestParam Instant since) {
-		return chatService.getChatByCrewIdAfterDateTime(crewId, since)
+	public Flux<ApiResponse<Chat>> getChatByRoomId(@PathVariable Long crewId,
+		@RequestHeader String uuid) {
+		return chatService.getChatByCrewIdAfterDateTime(crewId, uuid)
 			.map(chat -> ApiResponse.onSuccess(SuccessStatus.FIND_CHAT_CONTENT, chat))
 			.subscribeOn(Schedulers.boundedElastic());
 	}
-	// @Operation(summary = "(특정 소모임의) 실시간 채팅 내역 조회", description = "특정 채팅 id 이후의 채팅 내역을 실시간으로 조회한다.")
-	// @GetMapping(value = "/{crewId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	// public Flux<ApiResponse<Chat>> getChatByRoomId(@PathVariable Long crewId) {
-	// 	return chatService.getStreamChatByCrewId(crewId)
-	// 		.map(chat -> ApiResponse.onSuccess(SuccessStatus.FIND_CHAT_CONTENT, chat))
-	// 		.subscribeOn(Schedulers.boundedElastic());
-	// }
-
 }
