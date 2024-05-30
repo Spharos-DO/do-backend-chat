@@ -1,12 +1,12 @@
-package hobbiedo.chat.dto.request;
+package hobbiedo.chat.vo.request;
 
 import lombok.Getter;
 
 @Getter
-public class ChatSendDTO {
+public class ChatSendVo {
 	private Long crewId;
-	private String uuid;
 	private String text;
 	private String imageUrl;
 	private String videoUrl;
+	private String entryExitNotice;
 }
