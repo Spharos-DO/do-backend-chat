@@ -23,15 +23,15 @@ public class ChatUnReadStatus {
 	private String id;
 	private String uuid;
 	private Long crewId;
-	private Instant lastAt;
-	private Integer count;
+	private Instant lastReadAt;
+	private Integer unreadCount;
 
 	@Builder
-	public ChatUnReadStatus(String id, String uuid, Long crewId, Instant lastAt, Integer count) {
+	public ChatUnReadStatus(String id, String uuid, Long crewId, Instant lastReadAt, Integer unreadCount) {
 		this.id = id;
 		this.uuid = uuid;
 		this.crewId = crewId;
-		this.lastAt = lastAt;
-		this.count = count;
+		this.lastReadAt = lastReadAt;
+		this.unreadCount = unreadCount;
 	}
 }

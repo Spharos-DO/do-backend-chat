@@ -39,6 +39,6 @@ public class ChatServiceImp implements ChatService {
 		return chatUnReadStatusRepository.findByUuidAndCrewId(uuid, crewId)
 			.flatMapMany(
 				chatUnReadStatus -> chatRepository.findChatByCrewIdAndCreatedAtOrAfter(crewId,
-					chatUnReadStatus.getLastAt()));
+					chatUnReadStatus.getLastReadAt()));
 	}
 }
