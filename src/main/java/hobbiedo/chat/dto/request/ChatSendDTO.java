@@ -13,14 +13,13 @@ public class ChatSendDTO {
 	private String videoUrl;
 	private String entryExitNotice;
 
-	public Chat fromEntity(String uuid) {
+	public Chat toEntity(String uuid) {
 		return Chat.builder()
-			.crewId(getCrewId())
+			.crewId(crewId)
 			.uuid(uuid)
-			.text(getText())
-			.imageUrl(getImageUrl())
-			.videoUrl(getVideoUrl())
-			.entryExitNotice(getEntryExitNotice())
+			.text(text)
+			.imageUrl(imageUrl)
+			.entryExitNotice(entryExitNotice)
 			.createdAt(Instant.now())
 			.build();
 	}
