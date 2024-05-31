@@ -25,20 +25,17 @@ public class Chat {
 	private String uuid;
 	private String text;
 	private String imageUrl;
-	private String videoUrl;
 	private String entryExitNotice;
 	private Instant createdAt;
 
 	@Builder
 	public Chat(String id, Long crewId, String uuid, String text, String imageUrl,
-		String videoUrl,
 		String entryExitNotice, Instant createdAt) {
 		this.id = id;
 		this.crewId = crewId;
 		this.uuid = uuid;
 		this.text = text;
 		this.imageUrl = imageUrl;
-		this.videoUrl = videoUrl;
 		this.entryExitNotice = entryExitNotice;
 		this.createdAt = createdAt;
 	}
