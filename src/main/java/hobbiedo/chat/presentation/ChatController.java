@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import hobbiedo.chat.application.ChatService;
 import hobbiedo.chat.domain.Chat;
 import hobbiedo.chat.dto.request.ChatSendDTO;
+import hobbiedo.chat.dto.response.ChatStreamDTO;
 import hobbiedo.global.base.BaseResponse;
 import hobbiedo.global.status.SuccessStatus;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,10 +39,10 @@ public class ChatController {
 
 	@Operation(summary = "(특정 소모임의) 실시간 채팅 내역 조회", description = "특정 시간(Instant)과 그 이후의 채팅 내역을 실시간으로 조회한다.")
 	@GetMapping(value = "/{crewId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	public Flux<BaseResponse<Chat>> getStreamChat(@PathVariable Long crewId,
+	public Flux<BaseResponse<ChatStreamDTO>> getStreamChat(@PathVariable Long crewId,
 		@RequestHeader String uuid) {
 		return chatService.getStreamChat(crewId, uuid)
-			.map(chat -> BaseResponse.onSuccess(SuccessStatus.FIND_CHAT_CONTENT, chat))
+			.map(chatStreamDTO -> BaseResponse.onSuccess(SuccessStatus.FIND_CHAT_CONTENT, chatStreamDTO))
 			.subscribeOn(Schedulers.boundedElastic());
 	}
 
