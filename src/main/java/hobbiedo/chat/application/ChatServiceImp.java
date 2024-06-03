@@ -4,9 +4,12 @@ import org.springframework.stereotype.Service;
 
 import hobbiedo.chat.domain.Chat;
 import hobbiedo.chat.dto.request.ChatSendDTO;
+import hobbiedo.chat.dto.request.LastChatTimeDTO;
 import hobbiedo.chat.dto.response.ChatStreamDTO;
 import hobbiedo.chat.infrastructure.ChatRepository;
 import hobbiedo.chat.infrastructure.ChatUnReadStatusRepository;
+import hobbiedo.global.exception.GlobalException;
+import hobbiedo.global.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -55,5 +58,21 @@ public class ChatServiceImp implements ChatService {
 	// 				.switchIfEmpty(Mono.error(new GlobalException(ErrorStatus.NO_CHAT_CONTENT)))
 	// 		);
 	// }
+	@Override
+	public Mono<Void> updateLastReadAt(String uuid, Long crewId,
+		LastChatTimeDTO lastChatTimeDTO) { // 안 읽은 채팅 개수 수정 같이 필요
+		return chatUnReadStatusRepository.findByCrewIdAndUuid(crewId, uuid)
+			.flatMap(chatUnReadStatus -> chatUnReadStatusRepository
+				.save(lastChatTimeDTO.toEntity(chatUnReadStatus)))
+			.switchIfEmpty(Mono.error(new GlobalException(ErrorStatus.NO_FIND_CHAT_UNREAD_STATUS)))
+			.onErrorMap(e -> new GlobalException(ErrorStatus.INTERNAL_SERVER_ERROR, e.getMessage()))
+			.then();
+	}
 
+	// @Override
+	// public Mono<UnReadCountDTO> getUnreadCount(Long crewId, String uuid) {
+	// 	return chatUnReadStatusRepository.findByCrewIdAndUuid(crewId, uuid)
+	// 		.map(UnReadCountDTO::toDTO)
+	// 		.switchIfEmpty(Mono.error(new GlobalException(ErrorStatus.NO_FIND_CHAT_UNREAD_STATUS)));
+	// }
 }
