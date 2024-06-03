@@ -1,20 +1,13 @@
 plugins {
-<<<<<<< HEAD
     id 'java'
     id 'org.springframework.boot' version '3.2.5'
     id 'io.spring.dependency-management' version '1.1.4'
-=======
-	id 'java'
-	id 'org.springframework.boot' version '3.2.5'
-	id 'io.spring.dependency-management' version '1.1.4'
->>>>>>> 767b9bd (init: response entity 와 git issue, pr templete 세팅)
 }
 
 group = 'hobbie-do'
 version = '0.0.1-SNAPSHOT'
 
 java {
-<<<<<<< HEAD
     sourceCompatibility = '17'
 }
 
@@ -57,31 +50,4 @@ dependencyManagement {
 
 tasks.named('test') {
     useJUnitPlatform()
-=======
-	sourceCompatibility = '17'
-}
-
-configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
-}
-
-repositories {
-	mavenCentral()
-}
-
-dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb-reactive'
-	implementation 'org.springframework.boot:spring-boot-starter-webflux'
-	compileOnly 'org.projectlombok:lombok'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'io.projectreactor:reactor-test'
-}
-
-tasks.named('test') {
-	useJUnitPlatform()
->>>>>>> 767b9bd (init: response entity 와 git issue, pr templete 세팅)
 }
