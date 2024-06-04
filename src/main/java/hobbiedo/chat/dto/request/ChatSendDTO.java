@@ -1,4 +1,4 @@
-package hobbiedo.chat.vo.request;
+package hobbiedo.chat.dto.request;
 
 import java.time.Instant;
 
@@ -6,12 +6,11 @@ import hobbiedo.chat.domain.Chat;
 import lombok.Getter;
 
 @Getter
-public class ChatSendVo {
+public class ChatSendDTO {
 	private Long crewId;
 	private String text;
 	private String imageUrl;
 	private String entryExitNotice;
-<<<<<<< HEAD
 
 	public Chat toEntity(String uuid) {
 		return Chat.builder()
@@ -23,6 +22,4 @@ public class ChatSendVo {
 			.createdAt(Instant.now())
 			.build();
 	}
-=======
->>>>>>> 8de2d9f (fix: ChatApplication 에서 @OpenAPIDefinition 제거)
 }
