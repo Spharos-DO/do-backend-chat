@@ -49,7 +49,28 @@ public class ChatServiceImp implements ChatService {
 	// 			})
 	// 		);
 	// }
+	// public Flux<LastChatInfoDTO> streamLatestChats(String uuid) {
+	// 	return chatRepository.findLatestChatsByUuid(uuid)
+	// 		.collectList()  // 각 크루의 최신 채팅 시간들
+	// 		.flatMapMany(latestChats -> {
+	// 			// 각 크루의 최신 채팅 시간 기준으로 정렬
+	// 			List<Chat> sortedChats = latestChats.stream()
+	// 				.sorted(Comparator.comparing(Chat::getCreatedAt))
+	// 				.toList();
 	//
+	// 			// 정렬된 최신 채팅 데이터를 Flux로 변환
+	// 			Flux<Chat> sortedChatsFlux = Flux.fromIterable(sortedChats);
+	//
+	// 			// 각 크루의 최신 채팅 시간 이후의 메시지를 스트리밍
+	// 			Flux<Chat> newChatsFlux = Flux.fromIterable(sortedChats)
+	// 				.flatMap(chat -> chatRepository.findChatByCrewIdAndCreatedAtOrAfter(
+	// 				chat.getCrewId(), chat.getCreatedAt()));
+	//
+	// 			return newChatsFlux.flatMap(chat -> setLastChatContent(chat)
+	// 				.map(lastChatContent -> LastChatInfoDTO.toDTO(chat, lastChatContent)));
+	// 		});
+	// }
+
 	// private Mono<String> setLastChatContent(Chat chat) {
 	// 	return Mono.justOrEmpty(chat.getText())
 	// 		.switchIfEmpty(
@@ -58,6 +79,7 @@ public class ChatServiceImp implements ChatService {
 	// 				.switchIfEmpty(Mono.error(new GlobalException(ErrorStatus.NO_CHAT_CONTENT)))
 	// 		);
 	// }
+
 	@Override
 	public Mono<Void> updateLastReadAt(String uuid, Long crewId,
 		LastChatTimeDTO lastChatTimeDTO) { // 안 읽은 채팅 개수 수정 같이 필요

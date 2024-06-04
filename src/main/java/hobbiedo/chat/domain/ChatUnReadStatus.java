@@ -23,8 +23,8 @@ public class ChatUnReadStatus {
 	private String id;
 	private String uuid;
 	private Long crewId;
-	private Instant lastReadAt;
-	private Integer unreadCount;
+	private Instant lastReadAt; // 새로운 채팅으로 들어오고 나간 순간 데이터 쌓으면 필요 없음
+	private Integer unreadCount; // 레디스 집계
 
 	@Builder
 	public ChatUnReadStatus(String id, String uuid, Long crewId, Instant lastReadAt, Integer unreadCount) {

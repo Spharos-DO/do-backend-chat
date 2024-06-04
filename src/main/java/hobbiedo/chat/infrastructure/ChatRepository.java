@@ -18,6 +18,19 @@ public interface ChatRepository extends ReactiveMongoRepository<Chat, String> {
 
 	// @Query(value = "{ 'crewId': ?0, 'entryExitNotice': null }",
 	// 	sort = "{ 'createdAt': -1 }", fields = "{ 'createdAt': 1 }")
+
+	// @Aggregation(pipeline = {
+	// 	"{ '$match': { 'crewId': ?0, 'entryExitNotice': null } }",
+	// 	"{ '$sort': { 'createdAt': -1 } }",
+	// 	"{ '$limit': 1 }"
+	// })
 	// Mono<Chat> findLatestByCrewId(Long crewId);
+	// @Aggregation(pipeline = {
+	// 	"{ '$match': { 'uuid': ?0 } }",
+	// 	"{ '$sort': { 'createdAt': -1 } }",
+	// 	"{ '$group': { '_id': '$crewId', 'latestChat': { '$first': '$$ROOT' } } }",
+	// 	"{ '$project': { 'crewId': '$_id', 'createdAt': '$latestChat.createdAt' } }"
+	// })
+	// Flux<Chat> findLatestChatsByUuid(String uuid);
 
 }
