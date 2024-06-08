@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 import hobbiedo.chat.domain.Chat;
 import hobbiedo.chat.dto.request.ChatSendDTO;
-import hobbiedo.chat.dto.request.LastChatTimeDTO;
+import hobbiedo.chat.dto.request.LastStatusModifyDTO;
 import hobbiedo.chat.dto.response.ChatStreamDTO;
 import hobbiedo.chat.dto.response.LastChatInfoDTO;
 import hobbiedo.chat.infrastructure.ChatLastStatusRepository;
@@ -59,11 +59,10 @@ public class ChatServiceImp implements ChatService {
 	}
 
 	@Override
-	public Mono<Void> updateLastReadAt(String uuid, Long crewId,
-		LastChatTimeDTO lastChatTimeDTO) {
-		return chatLastStatusRepository.findByCrewIdAndUuid(crewId, uuid)
+	public Mono<Void> updateLastStatusAt(LastStatusModifyDTO lastStatusModifyDTO, String uuid) {
+		return chatLastStatusRepository.findByCrewIdAndUuid(lastStatusModifyDTO.getCrewId(), uuid)
 			.flatMap(chatUnReadStatus -> chatLastStatusRepository
-				.save(lastChatTimeDTO.toEntity(chatUnReadStatus)))
+				.save(lastStatusModifyDTO.toEntity(chatUnReadStatus)))
 			.switchIfEmpty(Mono.error(new GlobalException(ErrorStatus.NO_FIND_CHAT_UNREAD_STATUS)))
 			.onErrorMap(e -> new GlobalException(ErrorStatus.INTERNAL_SERVER_ERROR, e.getMessage()))
 			.then();

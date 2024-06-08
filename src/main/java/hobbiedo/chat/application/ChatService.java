@@ -2,9 +2,8 @@ package hobbiedo.chat.application;
 
 import java.time.Instant;
 
-import hobbiedo.chat.domain.Chat;
 import hobbiedo.chat.dto.request.ChatSendDTO;
-import hobbiedo.chat.dto.request.LastChatTimeDTO;
+import hobbiedo.chat.dto.request.LastStatusModifyDTO;
 import hobbiedo.chat.dto.response.ChatStreamDTO;
 import hobbiedo.chat.dto.response.LastChatInfoDTO;
 import reactor.core.publisher.Flux;
@@ -18,5 +17,5 @@ public interface ChatService {
 
 	Flux<LastChatInfoDTO> getStreamLatestChat(Long crewId, Instant lastChatAt);
 
-	Mono<Void> updateLastReadAt(String uuid, Long crewId, LastChatTimeDTO lastChatTimeDTO);
+	Mono<Void> updateLastStatusAt(LastStatusModifyDTO lastStatusModifyDTO, String uuid);
 }

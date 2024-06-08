@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import hobbiedo.chat.application.ChatService;
 import hobbiedo.chat.dto.request.ChatSendDTO;
-import hobbiedo.chat.dto.request.LastChatTimeDTO;
+import hobbiedo.chat.dto.request.LastStatusModifyDTO;
 import hobbiedo.chat.dto.response.ChatStreamDTO;
 import hobbiedo.chat.dto.response.LastChatInfoDTO;
 import hobbiedo.global.base.BaseResponse;
@@ -60,14 +60,13 @@ public class ChatController {
 		//.subscribeOn(Schedulers.boundedElastic());
 	}
 
-	@Operation(summary = "(한 유저의 특정 소모임에서) 마지막 읽은 채팅 시간 수정",
-		description = "한 유저가 채팅방을 나갈 때 마지막으로 읽은 채팅의 시간을 가져와 수정합니다.")
-	@PostMapping("/last-read-at/{crewId}")
-	public Mono<BaseResponse<Void>> updateLastReadAt(@PathVariable Long crewId,
-		@RequestBody LastChatTimeDTO lastChatTimeDTO,
+	@Operation(summary = "채팅방 접속 여부 변경",
+		description = "한 유저가 채팅방을 접속할 때와 나갈 때, 접속 여부를 변경한다.")
+	@PostMapping("/chat/connection")
+	public Mono<BaseResponse<Void>> updateLastReadAt(@RequestBody LastStatusModifyDTO lastStatusModifyDTO,
 		@RequestHeader String uuid) {
-		return chatService.updateLastReadAt(uuid, crewId, lastChatTimeDTO)
-			.then(Mono.just(BaseResponse.onSuccess(SuccessStatus.UPDATE_LAST_READ_AT, null)));
+		return chatService.updateLastStatusAt(lastStatusModifyDTO, uuid)
+			.then(Mono.just(BaseResponse.onSuccess(SuccessStatus.UPDATE_CONNECTION_STATUS, null)));
 	}
 
 	// 	@Operation(summary = "(한 유저의 특정 소모임에서) 안 읽은 채팅 개수 조회",

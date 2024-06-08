@@ -9,7 +9,7 @@ public enum SuccessStatus { //메시지를 중앙에서 관리하는 것이 유�
 	FIND_CHAT_CONTENT("채팅 내용 조회에 성공하였습니다."),
 	CREATE_CHAT("새로운 채팅이 생성되었습니다."),
 	FIND_LAST_CHAT("업데이트 된 마지막 채팅 내역 조회에 성공하였습니다."),
-	UPDATE_LAST_READ_AT("마지막 읽은 채팅 시간을 수정하였습니다."),
+	UPDATE_CONNECTION_STATUS("한 유저의 특정 소모임에 대한 접속 여부를 변경하였습니다."),
 	FIND_UNREAD_COUNT("안 읽은 채팅 개수 조회에 성공하였습니다.");
 
 	private final String status;
