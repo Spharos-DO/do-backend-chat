@@ -6,8 +6,8 @@ import hobbiedo.chat.domain.Chat;
 import hobbiedo.chat.dto.request.ChatSendDTO;
 import hobbiedo.chat.dto.request.LastChatTimeDTO;
 import hobbiedo.chat.dto.response.ChatStreamDTO;
+import hobbiedo.chat.infrastructure.ChatLastStatusRepository;
 import hobbiedo.chat.infrastructure.ChatRepository;
-import hobbiedo.chat.infrastructure.ChatUnReadStatusRepository;
 import hobbiedo.global.exception.GlobalException;
 import hobbiedo.global.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ import reactor.core.publisher.Mono;
 @Service
 public class ChatServiceImp implements ChatService {
 	private final ChatRepository chatRepository;
-	private final ChatUnReadStatusRepository chatUnReadStatusRepository;
+	private final ChatLastStatusRepository chatLastStatusRepository;
 
 	@Override
 	public Mono<Chat> sendChat(ChatSendDTO chatSendDTO,
@@ -28,7 +28,7 @@ public class ChatServiceImp implements ChatService {
 
 	@Override
 	public Flux<ChatStreamDTO> getStreamChat(Long crewId, String uuid) {
-		return chatUnReadStatusRepository.findByUuidAndCrewId(uuid, crewId)
+		return chatLastStatusRepository.findLastReadAtByCrewIdAndUuid(crewId, uuid)
 			.flatMapMany(
 				chatUnReadStatus -> chatRepository.findChatByCrewIdAndCreatedAtOrAfter(crewId,
 					chatUnReadStatus.getLastReadAt()))
@@ -83,8 +83,8 @@ public class ChatServiceImp implements ChatService {
 	@Override
 	public Mono<Void> updateLastReadAt(String uuid, Long crewId,
 		LastChatTimeDTO lastChatTimeDTO) { // 안 읽은 채팅 개수 수정 같이 필요
-		return chatUnReadStatusRepository.findByCrewIdAndUuid(crewId, uuid)
-			.flatMap(chatUnReadStatus -> chatUnReadStatusRepository
+		return chatLastStatusRepository.findByCrewIdAndUuid(crewId, uuid)
+			.flatMap(chatUnReadStatus -> chatLastStatusRepository
 				.save(lastChatTimeDTO.toEntity(chatUnReadStatus)))
 			.switchIfEmpty(Mono.error(new GlobalException(ErrorStatus.NO_FIND_CHAT_UNREAD_STATUS)))
 			.onErrorMap(e -> new GlobalException(ErrorStatus.INTERNAL_SERVER_ERROR, e.getMessage()))
