@@ -1,5 +1,7 @@
 package hobbiedo.chat.presentation;
 
+import java.time.Instant;
+
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -7,13 +9,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import hobbiedo.chat.application.ChatService;
-import hobbiedo.chat.domain.Chat;
 import hobbiedo.chat.dto.request.ChatSendDTO;
 import hobbiedo.chat.dto.request.LastChatTimeDTO;
 import hobbiedo.chat.dto.response.ChatStreamDTO;
+import hobbiedo.chat.dto.response.LastChatInfoDTO;
 import hobbiedo.global.base.BaseResponse;
 import hobbiedo.global.status.SuccessStatus;
 import io.swagger.v3.oas.annotations.Operation;
@@ -47,14 +50,15 @@ public class ChatController {
 		//	.subscribeOn(Schedulers.boundedElastic());
 	}
 
-	// @Operation(summary = "(채팅 리스트에서) 마지막 채팅 정보 조회", description = "한 유저의 채팅방 리스트에서 채팅방들의 마지막 대화 관련 정보를 조회한다. ")
-	// @GetMapping(value = "/latest", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	// public Flux<BaseResponse<LastChatInfoDTO>> getLatestChats(@RequestHeader String uuid) {
-	// 	return chatService.streamLatestChats(uuid)
-	// 		.map(lastChatInfoDTO -> BaseResponse.onSuccess(SuccessStatus.FIND_LAST_CHAT,
-	// 			lastChatInfoDTO))
-	// 		.subscribeOn(Schedulers.boundedElastic());
-	// }
+	@Operation(summary = "(채팅방 리스트에서) 실시간 마지막 채팅과 안읽음 개수 조회", description = "채팅방 리스트에서 채팅방당 실시간으로 업데이트 되는 내역을 조회한다.")
+	@GetMapping(value = "/latest/stream/{crewId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	public Flux<BaseResponse<LastChatInfoDTO>> getLatestChats(@PathVariable Long crewId,
+		@RequestParam Instant lastChatAt) {
+		return chatService.getStreamLatestChat(crewId, lastChatAt)
+			.map(lastChatInfoDTO -> BaseResponse.onSuccess(SuccessStatus.FIND_LAST_CHAT,
+				lastChatInfoDTO));
+		//.subscribeOn(Schedulers.boundedElastic());
+	}
 
 	@Operation(summary = "(한 유저의 특정 소모임에서) 마지막 읽은 채팅 시간 수정",
 		description = "한 유저가 채팅방을 나갈 때 마지막으로 읽은 채팅의 시간을 가져와 수정합니다.")
