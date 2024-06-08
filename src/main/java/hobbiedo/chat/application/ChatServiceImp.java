@@ -21,9 +21,11 @@ public class ChatServiceImp implements ChatService {
 	private final ChatLastStatusRepository chatLastStatusRepository;
 
 	@Override
-	public Mono<Chat> sendChat(ChatSendDTO chatSendDTO,
+	public Mono<Void> sendChat(ChatSendDTO chatSendDTO,
 		String uuid) { // 응답을 void 로 보내면 error를 잡을 수 없어서 chat으로 return
-		return chatRepository.save(chatSendDTO.toEntity(uuid));
+		return chatRepository.save(chatSendDTO.toEntity(uuid))
+			.then()
+			.onErrorMap(e -> new GlobalException(ErrorStatus.INTERNAL_SERVER_ERROR, e.getMessage()));
 	}
 
 	@Override

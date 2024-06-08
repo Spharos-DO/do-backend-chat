@@ -31,10 +31,10 @@ public class ChatController {
 
 	@Operation(summary = "채팅 전송", description = "소모임에 하나의 채팅을 전송한다.")
 	@PostMapping
-	public Mono<BaseResponse<Chat>> sendChat(@RequestBody ChatSendDTO chatSendVo,
+	public Mono<BaseResponse<Void>> sendChat(@RequestBody ChatSendDTO chatSendDTO,
 		@RequestHeader String uuid) {
-		return chatService.sendChat(chatSendVo, uuid)
-			.map(chat -> BaseResponse.onSuccess(SuccessStatus.CREATE_CHAT, chat));
+		return chatService.sendChat(chatSendDTO, uuid)
+			.then(Mono.just(BaseResponse.onSuccess(SuccessStatus.CREATE_CHAT, null)));
 	}
 
 	@Operation(summary = "(특정 소모임의) 실시간 채팅 내역 조회", description = "특정 시간(Instant)과 그 이후의 채팅 내역을 실시간으로 조회한다.")
