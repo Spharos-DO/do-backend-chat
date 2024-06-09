@@ -10,7 +10,6 @@ public class ChatSendDTO {
 	private Long crewId;
 	private String text;
 	private String imageUrl;
-	private String videoUrl;
 	private String entryExitNotice;
 
 	public Chat toEntity(String uuid) {

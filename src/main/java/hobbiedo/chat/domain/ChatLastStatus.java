@@ -13,25 +13,26 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Document(collection = "ChatUnReadStatus")
+@Document(collection = "ChatLastStatus")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @CompoundIndex(name = "uuid_crewId_idx", def = "{'uuid': 1, 'crewId': 1}")
-public class ChatUnReadStatus {
+public class ChatLastStatus {
 	@Id
 	private String id;
 	private String uuid;
 	private Long crewId;
+	private boolean connectionStatus;
 	private Instant lastReadAt;
-	private Integer unreadCount;
 
 	@Builder
-	public ChatUnReadStatus(String id, String uuid, Long crewId, Instant lastReadAt, Integer unreadCount) {
+	public ChatLastStatus(String id, String uuid, Long crewId, boolean connectionStatus,
+		Instant lastReadAt) {
 		this.id = id;
 		this.uuid = uuid;
 		this.crewId = crewId;
+		this.connectionStatus = connectionStatus;
 		this.lastReadAt = lastReadAt;
-		this.unreadCount = unreadCount;
 	}
 }
