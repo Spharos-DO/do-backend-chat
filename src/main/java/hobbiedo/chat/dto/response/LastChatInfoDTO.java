@@ -11,12 +11,14 @@ import lombok.Getter;
 public class LastChatInfoDTO {
 	private Long crewId;
 	private String lastChatContent;
+	private int unreadCount;
 	private Instant createdAt;
 
 	public static LastChatInfoDTO toDTO(Chat chat, String lastChatContent) {
 		return LastChatInfoDTO.builder()
 			.crewId(chat.getCrewId())
 			.lastChatContent(lastChatContent)
+			.unreadCount(3)
 			.createdAt(chat.getCreatedAt())
 			.build();
 	}
