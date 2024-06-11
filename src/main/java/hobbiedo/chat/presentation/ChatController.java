@@ -6,6 +6,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -62,8 +63,9 @@ public class ChatController {
 
 	@Operation(summary = "채팅방 접속 여부 변경",
 		description = "한 유저가 채팅방을 접속할 때와 나갈 때, 접속 여부를 변경한다.")
-	@PostMapping("/chat/connection")
-	public Mono<BaseResponse<Void>> updateLastReadAt(@RequestBody LastStatusModifyDTO lastStatusModifyDTO,
+	@PutMapping("/chat/connection")
+	public Mono<BaseResponse<Void>> updateLastReadAt(
+		@RequestBody LastStatusModifyDTO lastStatusModifyDTO,
 		@RequestHeader String uuid) {
 		return chatService.updateLastStatusAt(lastStatusModifyDTO, uuid)
 			.then(Mono.just(BaseResponse.onSuccess(SuccessStatus.UPDATE_CONNECTION_STATUS, null)));
