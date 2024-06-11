@@ -63,7 +63,7 @@ public class ChatController {
 
 	@Operation(summary = "채팅방 접속 여부 변경",
 		description = "한 유저가 채팅방을 접속할 때와 나갈 때, 접속 여부를 변경한다.")
-	@PutMapping("/chat/connection")
+	@PutMapping("/connection")
 	public Mono<BaseResponse<Void>> updateLastReadAt(
 		@RequestBody LastStatusModifyDTO lastStatusModifyDTO,
 		@RequestHeader String uuid) {
