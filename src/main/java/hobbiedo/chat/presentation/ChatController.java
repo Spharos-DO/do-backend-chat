@@ -36,7 +36,7 @@ public class ChatController {
 	@Operation(summary = "채팅 전송", description = "소모임에 하나의 채팅을 전송한다.")
 	@PostMapping
 	public Mono<BaseResponse<Void>> sendChat(@RequestBody ChatSendDTO chatSendDTO,
-		@RequestHeader String uuid) {
+		@RequestHeader(name = "Uuid") String uuid) {
 		return chatService.sendChat(chatSendDTO, uuid)
 			.then(Mono.just(BaseResponse.onSuccess(SuccessStatus.CREATE_CHAT, null)));
 	}
@@ -66,7 +66,7 @@ public class ChatController {
 	@PutMapping("/connection")
 	public Mono<BaseResponse<Void>> updateLastReadAt(
 		@RequestBody LastStatusModifyDTO lastStatusModifyDTO,
-		@RequestHeader String uuid) {
+		@RequestHeader(name = "Uuid") String uuid) {
 		return chatService.updateLastStatusAt(lastStatusModifyDTO, uuid)
 			.then(Mono.just(BaseResponse.onSuccess(SuccessStatus.UPDATE_CONNECTION_STATUS, null)));
 	}
