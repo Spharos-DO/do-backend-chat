@@ -35,7 +35,6 @@ public class ChatServiceImp implements ChatService {
 	@Override
 	public Flux<ChatStreamDTO> getStreamChat(Long crewId, String uuid) {
 		return chatLastStatusRepository.findLastReadAtByCrewIdAndUuid(crewId, uuid)
-			.switchIfEmpty(Mono.error(new GlobalException(ErrorStatus.NO_FIND_CHAT_UNREAD_STATUS)))
 			.flatMapMany(
 				chatUnReadStatus -> chatRepository.findByCrewIdAndCreatedAtOrAfter(crewId,
 					chatUnReadStatus.getLastReadAt()))
