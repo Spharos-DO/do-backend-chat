@@ -1,7 +1,5 @@
 package hobbiedo.chat.presentation;
 
-import java.time.Instant;
-
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,7 +8,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import hobbiedo.chat.application.ChatService;
@@ -54,8 +51,8 @@ public class ChatController {
 	@Operation(summary = "(채팅방 리스트에서) 실시간 마지막 채팅과 안읽음 개수 조회", description = "채팅방 리스트에서 채팅방당 실시간으로 업데이트 되는 내역을 조회한다.")
 	@GetMapping(value = "/latest/stream/{crewId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public Flux<BaseResponse<LastChatInfoDTO>> getLatestChats(@PathVariable Long crewId,
-		@RequestParam Instant lastChatAt) {
-		return chatService.getStreamLatestChat(crewId, lastChatAt)
+		@RequestHeader(name = "Uuid") String uuid) {
+		return chatService.getStreamLatestChat(crewId, uuid)
 			.map(lastChatInfoDTO -> BaseResponse.onSuccess(SuccessStatus.FIND_LAST_CHAT,
 				lastChatInfoDTO));
 		//.subscribeOn(Schedulers.boundedElastic());

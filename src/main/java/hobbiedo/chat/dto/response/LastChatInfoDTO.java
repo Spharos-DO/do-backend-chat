@@ -14,11 +14,11 @@ public class LastChatInfoDTO {
 	private int unreadCount;
 	private Instant createdAt;
 
-	public static LastChatInfoDTO toDTO(Chat chat, String lastChatContent) {
+	public static LastChatInfoDTO toDTO(Chat chat, String lastChatContent, int unreadCount) {
 		return LastChatInfoDTO.builder()
 			.crewId(chat.getCrewId())
 			.lastChatContent(lastChatContent)
-			.unreadCount(3)
+			.unreadCount(Math.min(unreadCount, 999)) // 최대 999개까지만 표시
 			.createdAt(chat.getCreatedAt())
 			.build();
 	}
