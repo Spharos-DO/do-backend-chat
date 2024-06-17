@@ -15,7 +15,7 @@ public interface ChatService {
 
 	Flux<ChatStreamDTO> getStreamChat(Long crewId, String uuid);
 
-	Flux<LastChatInfoDTO> getStreamLatestChat(Long crewId, Instant lastChatAt);
+	Flux<LastChatInfoDTO> getStreamLatestChat(Long crewId, String uuid);
 
 	Mono<Void> updateLastStatusAt(LastStatusModifyDTO lastStatusModifyDTO, String uuid);
 }
