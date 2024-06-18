@@ -1,6 +1,4 @@
-package hobbiedo.chat.application;
-
-import java.time.Instant;
+package hobbiedo.chat.application.reactive;
 
 import hobbiedo.chat.dto.request.ChatSendDTO;
 import hobbiedo.chat.dto.request.LastStatusModifyDTO;
@@ -9,7 +7,7 @@ import hobbiedo.chat.dto.response.LastChatInfoDTO;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-public interface ChatService {
+public interface ReactiveChatService {
 
 	Mono<Void> sendChat(ChatSendDTO chatSendDTO, String uuid);
 

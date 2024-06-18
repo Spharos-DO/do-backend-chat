@@ -1,4 +1,4 @@
-package hobbiedo.chat.presentation;
+package hobbiedo.chat.presentation.reactive;
 
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import hobbiedo.chat.application.ChatService;
+import hobbiedo.chat.application.reactive.ReactiveChatService;
 import hobbiedo.chat.dto.request.ChatSendDTO;
 import hobbiedo.chat.dto.request.LastStatusModifyDTO;
 import hobbiedo.chat.dto.response.ChatStreamDTO;
@@ -27,8 +27,8 @@ import reactor.core.publisher.Mono;
 @RestController
 @Tag(name = "채팅", description = "Chat API")
 @RequestMapping("/v1/users/chat")
-public class ChatController {
-	private final ChatService chatService;
+public class ReactiveChatController {
+	private final ReactiveChatService chatService;
 
 	@Operation(summary = "채팅 전송", description = "소모임에 하나의 채팅을 전송한다.")
 	@PostMapping

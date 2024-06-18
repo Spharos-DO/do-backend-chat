@@ -1,4 +1,4 @@
-package hobbiedo.chat.application;
+package hobbiedo.chat.application.reactive;
 
 import java.time.Instant;
 
@@ -9,8 +9,8 @@ import hobbiedo.chat.dto.request.ChatSendDTO;
 import hobbiedo.chat.dto.request.LastStatusModifyDTO;
 import hobbiedo.chat.dto.response.ChatStreamDTO;
 import hobbiedo.chat.dto.response.LastChatInfoDTO;
-import hobbiedo.chat.infrastructure.ChatLastStatusRepository;
-import hobbiedo.chat.infrastructure.ChatRepository;
+import hobbiedo.chat.infrastructure.reactive.ReactiveChatLastStatusRepository;
+import hobbiedo.chat.infrastructure.reactive.ReactiveChatRepository;
 import hobbiedo.global.exception.GlobalException;
 import hobbiedo.global.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
@@ -19,9 +19,9 @@ import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
 @Service
-public class ChatServiceImp implements ChatService {
-	private final ChatRepository chatRepository;
-	private final ChatLastStatusRepository chatLastStatusRepository;
+public class ReactiveChatServiceImp implements ReactiveChatService {
+	private final ReactiveChatRepository chatRepository;
+	private final ReactiveChatLastStatusRepository chatLastStatusRepository;
 	private final UnreadCountService unreadCountService;
 
 	@Override
@@ -48,7 +48,8 @@ public class ChatServiceImp implements ChatService {
 			.flatMapMany(latestChat -> {
 				Instant latestChatCreatedAt = latestChat.getCreatedAt();
 				return chatLastStatusRepository.findByCrewIdAndUuid(crewId, uuid)
-					.switchIfEmpty(Mono.error(new GlobalException(ErrorStatus.NO_FIND_CHAT_UNREAD_STATUS)))
+					.switchIfEmpty(
+						Mono.error(new GlobalException(ErrorStatus.NO_FIND_CHAT_UNREAD_STATUS)))
 					.flatMapMany(chatLastStatus -> {
 						Instant lastReadAt = chatLastStatus.getLastReadAt();
 						return chatRepository.countByCrewIdAndCreatedAtBetween(crewId, lastReadAt,
@@ -68,7 +69,8 @@ public class ChatServiceImp implements ChatService {
 				.thenReturn(chat))
 			.flatMap(chat -> unreadCountService.getUnreadCount(crewId, uuid)
 				.flatMap(unreadCount -> chatLastStatusRepository.findById(chatLastStatusId)
-					.switchIfEmpty(Mono.error(new GlobalException(ErrorStatus.NO_FIND_CHAT_UNREAD_STATUS)))
+					.switchIfEmpty(
+						Mono.error(new GlobalException(ErrorStatus.NO_FIND_CHAT_UNREAD_STATUS)))
 					.flatMap(chatLastStatus -> setLastChatContent(chat)
 							.map(lastChatContent -> LastChatInfoDTO.toDTO(chat, lastChatContent,
 								chatLastStatus.isConnectionStatus() ? 0 : unreadCount.intValue()))
