@@ -1,4 +1,4 @@
-package hobbiedo.chat.infrastructure;
+package hobbiedo.chat.infrastructure.reactive;
 
 import java.time.Instant;
 
@@ -13,7 +13,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Repository
-public interface ChatRepository extends ReactiveMongoRepository<Chat, String> {
+public interface ReactiveChatRepository extends ReactiveMongoRepository<Chat, String> {
 	@Tailable
 	@Query(value = "{ 'crewId' : ?0, 'createdAt' : { $gte: ?1 } }", fields = "{ 'id': 0 }")
 	Flux<Chat> findByCrewIdAndCreatedAtOrAfter(Long crewId, Instant since);

@@ -1,4 +1,4 @@
-package hobbiedo.chat.infrastructure;
+package hobbiedo.chat.infrastructure.reactive;
 
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import hobbiedo.chat.domain.ChatLastStatus;
 import reactor.core.publisher.Mono;
 
-public interface ChatLastStatusRepository
+public interface ReactiveChatLastStatusRepository
 	extends ReactiveMongoRepository<ChatLastStatus, String> {
 
 	@Query(value = "{ 'crewId': ?0, 'uuid': ?1 }", fields = "{ 'lastReadAt': 1 }")

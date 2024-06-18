@@ -10,9 +10,13 @@ public enum ErrorStatus {
 	INTERNAL_SERVER_ERROR("SERVER500", "Internal server error"),
 	BAD_REQUEST("REQUEST400", "Bad request"),
 
+	NO_EXIST_IMAGE_CHAT("CHAT400", "조회 가능한 사진 체팅이 존재하지 않습니다."),
 	NO_FIND_LAST_CHAT("CHAT401", "채팅방의 마지막 채팅 정보가 존재하지 않습니다."),
 	NO_CHAT_CONTENT("CHAT402", "채팅 데이터에 내용(문자, 사진)이 존재하지 않습니다."),
-	NO_FIND_CHAT_UNREAD_STATUS("CHAT405", "채팅의 마지막 상태가 존재하지 않습니다."),;
+	NO_FIND_CHAT_UNREAD_STATUS("CHAT405", "채팅의 마지막 상태가 존재하지 않습니다."),
+	NO_EXIST_CHAT("CHAT406", "조회 가능한 체팅이 존재하지 않습니다."),
+	NO_EXIST_CHAT_UNREAD_STATUS("CHAT407", "조회 가능한 체팅 읽음 상태가 존재하지 않습니다."),
+	NO_EXIST_UNREAD_COUNT("CHAT408", "조회 가능한 읽지 않은 체팅 개수가 존재하지 않습니다."),;
 
 	private final String status;
 	private final String message;

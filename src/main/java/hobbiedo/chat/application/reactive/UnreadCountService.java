@@ -1,4 +1,4 @@
-package hobbiedo.chat.application;
+package hobbiedo.chat.application.reactive;
 
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.stereotype.Service;

@@ -1,45 +1,43 @@
 package hobbiedo.global.exception;
 
-import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.bind.support.WebExchangeBindException;
 
 import hobbiedo.global.base.BaseResponse;
 import hobbiedo.global.status.ErrorStatus;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Mono;
 
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
 	@ExceptionHandler(GlobalException.class)
-	protected Mono<BaseResponse<?>> baseError(GlobalException ex, ServerHttpRequest request) {
-		log.error("errorStatus: {}, url: {}, message: {}", ex.getStatus(), request.getURI(),
+	protected BaseResponse<?> baseError(GlobalException ex, HttpServletRequest request) {
+		log.error("errorStatus: {}, url: {}, message: {}", ex.getStatus(), request.getRequestURI(),
 			ex.getMessage());
-		return Mono.just(BaseResponse.onFailure(ex.getStatus(), ex.getMessage()));
+		return BaseResponse.onFailure(ex.getStatus(), ex.getMessage());
 	}
 
-	// RuntimeException의 경우 일반적인 에러 메시지를 사용하여 보안 유지
+	// RuntimeException의 경우 일반적인 에러 메시지를 사용하여 보안 유지해야 함
 	@ExceptionHandler(RuntimeException.class)
-	protected Mono<BaseResponse<?>> runtimeError(RuntimeException ex, ServerHttpRequest request) {
-		log.error("url: {}, message: {}", request.getURI(), ex.getMessage());
-		return Mono.just(
-			BaseResponse.onFailure(ErrorStatus.INTERNAL_SERVER_ERROR, ex.getMessage()));
+	protected BaseResponse<?> runtimeError(RuntimeException ex, HttpServletRequest request) {
+		log.error("url: {}, message: {}", request.getRequestURI(), ex.getMessage());
+		return BaseResponse.onFailure(ErrorStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
 	}
 
-	@ExceptionHandler(WebExchangeBindException.class)
-	public Mono<BaseResponse<?>> processValidationError(WebExchangeBindException ex,
-		ServerHttpRequest request) {
-		log.error("url: {}, message: {}", request.getURI(), ex.getMessage());
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public BaseResponse<?> processValidationError(MethodArgumentNotValidException ex,
+		HttpServletRequest request) {
+		log.error("url: {}, message: {}", request.getRequestURI(), ex.getMessage());
 
 		StringBuilder builder = new StringBuilder();
-		ex.getFieldErrors().forEach(fieldError -> {
+		ex.getBindingResult().getFieldErrors().forEach(fieldError -> {
 			builder.append(fieldError.getDefaultMessage());
 			builder.append(" / ");
 		});
 
-		return Mono.just(BaseResponse.onFailure(ErrorStatus.BAD_REQUEST, builder.toString()));
+		return BaseResponse.onFailure(ErrorStatus.BAD_REQUEST, builder.toString());
 	}
 }
