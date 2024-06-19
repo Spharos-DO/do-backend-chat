@@ -1,5 +1,7 @@
 package hobbiedo.chat.kafka.dto;
 
+import java.time.Instant;
+
 import hobbiedo.chat.domain.Chat;
 import hobbiedo.chat.kafka.type.EntryExitType;
 import lombok.AllArgsConstructor;
@@ -19,6 +21,7 @@ public class EntryExitDTO {
 			.crewId(crewId)
 			.uuid(uuid)
 			.entryExitNotice(entryExitType.getMessage())
+			.createdAt(Instant.now())
 			.build();
 	}
 }
