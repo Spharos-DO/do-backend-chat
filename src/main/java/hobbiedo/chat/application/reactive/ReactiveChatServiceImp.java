@@ -11,6 +11,7 @@ import hobbiedo.chat.dto.response.ChatStreamDTO;
 import hobbiedo.chat.dto.response.LastChatInfoDTO;
 import hobbiedo.chat.infrastructure.reactive.ReactiveChatLastStatusRepository;
 import hobbiedo.chat.infrastructure.reactive.ReactiveChatRepository;
+import hobbiedo.chat.kafka.dto.EntryExitDTO;
 import hobbiedo.global.exception.GlobalException;
 import hobbiedo.global.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
@@ -97,6 +98,14 @@ public class ReactiveChatServiceImp implements ReactiveChatService {
 			.switchIfEmpty(Mono.error(new GlobalException(ErrorStatus.NO_FIND_CHAT_UNREAD_STATUS)))
 			.onErrorMap(e -> new GlobalException(ErrorStatus.INTERNAL_SERVER_ERROR, e.getMessage()))
 			.then();
+	}
+
+	@Override
+	public Mono<Void> sendEntryExitChat(EntryExitDTO entryExitDTO) {
+		return chatRepository.save(entryExitDTO.toEntity())
+			.then()
+			.onErrorMap(
+				e -> new GlobalException(ErrorStatus.INTERNAL_SERVER_ERROR, e.getMessage()));
 	}
 
 	// public Flux<LastChatInfoDTO> getStreamLatestChat(Long crewId) {
