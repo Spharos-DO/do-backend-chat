@@ -26,7 +26,7 @@ import hobbiedo.chat.dto.response.ChatListDTO;
 import hobbiedo.chat.dto.response.LastChatDTO;
 import hobbiedo.chat.infrastructure.mvc.ChatLastStatusRepository;
 import hobbiedo.chat.infrastructure.mvc.ChatRepository;
-import hobbiedo.chat.kafka.dto.ChatLastStatusCreateDTO;
+import hobbiedo.chat.kafka.dto.ChatEntryExitDTO;
 import hobbiedo.global.exception.GlobalException;
 import hobbiedo.global.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
@@ -122,8 +122,15 @@ public class ChatServiceImp implements ChatService {
 
 	@Transactional
 	@Override
-	public void createChatStatus(ChatLastStatusCreateDTO lastStatusCreateDTO) {
-		chatStatusRepository.save(lastStatusCreateDTO.toEntity());
+	public void createChatStatus(ChatEntryExitDTO chatEntryExitDTO) {
+		chatStatusRepository.save(chatEntryExitDTO.toChatLastStatusEntity());
+	}
+
+	@Transactional
+	@Override
+	public void deleteChatStatus(ChatEntryExitDTO chatEntryExitDTO) {
+		chatStatusRepository.deleteByCrewIdAndUuid(chatEntryExitDTO.getCrewId(),
+			chatEntryExitDTO.getUuid());
 	}
 
 	@Scheduled(cron = "0 0 0 * * ?") // 매일 자정에 실행

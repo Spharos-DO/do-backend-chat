@@ -16,4 +16,5 @@ public interface ChatLastStatusRepository extends MongoRepository<ChatLastStatus
 	@Query(value = "{ 'uuid': ?0 }", fields = "{ 'crewId': 1 }")
 	List<ChatLastStatus> findByUuid(String uuid);
 
+	void deleteByCrewIdAndUuid(long crewId, String uuid);
 }
