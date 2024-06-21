@@ -11,7 +11,7 @@ import hobbiedo.chat.dto.response.ChatStreamDTO;
 import hobbiedo.chat.dto.response.LastChatInfoDTO;
 import hobbiedo.chat.infrastructure.reactive.ReactiveChatLastStatusRepository;
 import hobbiedo.chat.infrastructure.reactive.ReactiveChatRepository;
-import hobbiedo.chat.kafka.dto.EntryExitDTO;
+import hobbiedo.chat.kafka.dto.ChatEntryExitDTO;
 import hobbiedo.global.exception.GlobalException;
 import hobbiedo.global.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
@@ -101,8 +101,8 @@ public class ReactiveChatServiceImp implements ReactiveChatService {
 	}
 
 	@Override
-	public Mono<Void> sendEntryExitChat(EntryExitDTO entryExitDTO) {
-		return chatRepository.save(entryExitDTO.toEntity())
+	public Mono<Void> sendEntryExitChat(ChatEntryExitDTO entryExitDTO) {
+		return chatRepository.save(entryExitDTO.toChatEntity())
 			.then()
 			.onErrorMap(
 				e -> new GlobalException(ErrorStatus.INTERNAL_SERVER_ERROR, e.getMessage()));
