@@ -33,7 +33,6 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class ChatServiceImp implements ChatService {
 	private final ChatRepository chatRepository;
 	private final ChatLastStatusRepository chatStatusRepository;
@@ -120,13 +119,11 @@ public class ChatServiceImp implements ChatService {
 			.toList();
 	}
 
-	@Transactional
 	@Override
 	public void createChatStatus(ChatEntryExitDTO chatEntryExitDTO) {
 		chatStatusRepository.save(chatEntryExitDTO.toChatLastStatusEntity());
 	}
 
-	@Transactional
 	@Override
 	public void deleteChatStatus(ChatEntryExitDTO chatEntryExitDTO) {
 		chatStatusRepository.deleteByCrewIdAndUuid(chatEntryExitDTO.getCrewId(),
@@ -134,7 +131,6 @@ public class ChatServiceImp implements ChatService {
 	}
 
 	@Scheduled(cron = "0 0 0 * * ?") // 매일 자정에 실행
-	@Transactional
 	@Override
 	public void deleteOldChatsWithImageUrl() {
 		// 3개월 전 시각 계산
