@@ -12,8 +12,8 @@ import org.springframework.data.mongodb.repository.Query;
 import hobbiedo.chat.domain.Chat;
 
 public interface ChatRepository extends MongoRepository<Chat, String> {
-	@Query("{ 'crewId': ?0, 'createdAt': { '$lt': ?1 } }")
-	List<Chat> findLastChatByCrewId(Long crewId, Instant lastReadAt, Pageable pageable);
+	@Query("{ 'crewId': ?0, 'createdAt': { '$gte': ?1, '$lt': ?2 } }")
+	List<Chat> findLastChatByCrewId(Long crewId, Instant joinTime, Instant lastReadAt, Pageable pageable);
 
 	@Query(value = "{ 'crewId': ?0, 'createdAt': { '$lt': ?1 } }", count = true)
 	int countByCrewIdAndCreatedAtBefore(Long crewId, Instant lastReadAt);

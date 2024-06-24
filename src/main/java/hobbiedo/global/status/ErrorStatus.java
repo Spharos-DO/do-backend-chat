@@ -17,7 +17,8 @@ public enum ErrorStatus {
 	NO_EXIST_CHAT("CHAT406", "조회 가능한 체팅이 존재하지 않습니다."),
 	NO_EXIST_CHAT_UNREAD_STATUS("CHAT407", "조회 가능한 체팅 읽음 상태가 존재하지 않습니다."),
 	NO_EXIST_UNREAD_COUNT("CHAT408", "조회 가능한 읽지 않은 체팅 개수가 존재하지 않습니다."),
-	NO_MATCH_ENTRY_EXIT_TYPE("CHAT409", "매칭되는 입퇴장 타입이 존재하지 않습니다."),;
+	NO_MATCH_ENTRY_EXIT_TYPE("CHAT409", "매칭되는 입퇴장 타입이 존재하지 않습니다."),
+	NO_EXIST_JOIN_TIME("CHAT410", "조회 가능한 입장 시간이 존재하지 않습니다."),;
 
 	private final String status;
 	private final String message;

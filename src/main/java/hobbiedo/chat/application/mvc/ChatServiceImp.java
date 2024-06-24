@@ -24,6 +24,7 @@ import hobbiedo.chat.dto.response.ChatImageDTO;
 import hobbiedo.chat.dto.response.ChatImageListDTO;
 import hobbiedo.chat.dto.response.ChatListDTO;
 import hobbiedo.chat.dto.response.LastChatDTO;
+import hobbiedo.chat.infrastructure.mvc.ChatJoinTimeRepository;
 import hobbiedo.chat.infrastructure.mvc.ChatLastStatusRepository;
 import hobbiedo.chat.infrastructure.mvc.ChatRepository;
 import hobbiedo.chat.kafka.dto.ChatEntryExitDTO;
@@ -37,14 +38,18 @@ import lombok.RequiredArgsConstructor;
 public class ChatServiceImp implements ChatService {
 	private final ChatRepository chatRepository;
 	private final ChatLastStatusRepository chatStatusRepository;
+	private final ChatJoinTimeRepository chatJoinTimeRepository;
 
 	@Override
 	public ChatHistoryDTO getChatHistoryBefore(Long crewId, String uuid, int page) {
 		int size = 10; // 페이지 당 데이터 개수
 		Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdAt")));
 		Instant lastReadAt = getLastReadAt(uuid, crewId);
+		Instant joinTime = chatJoinTimeRepository.findJoinTimeByUuidAndCrewId(uuid, crewId)
+			.orElseThrow(() -> new GlobalException(ErrorStatus.NO_EXIST_JOIN_TIME));
 
-		List<Chat> chatList = chatRepository.findLastChatByCrewId(crewId, lastReadAt, pageable);
+		List<Chat> chatList = chatRepository.findLastChatByCrewId(crewId, joinTime, lastReadAt,
+			pageable);
 		if (chatList.isEmpty()) {
 			throw new GlobalException(ErrorStatus.NO_EXIST_CHAT);
 		}
