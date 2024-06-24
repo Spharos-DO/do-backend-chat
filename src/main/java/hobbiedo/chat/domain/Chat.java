@@ -16,7 +16,6 @@ import lombok.NoArgsConstructor;
 @Document(collection = "Chat")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @CompoundIndex(name = "crewId_createdAt_idx", def = "{'crewId': 1, 'createdAt': 1}")
 public class Chat {
 	@Id
