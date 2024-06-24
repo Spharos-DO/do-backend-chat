@@ -31,7 +31,7 @@ public interface ReactiveChatRepository extends ReactiveMongoRepository<Chat, St
 	})
 	Mono<Chat> findLatestByCrewId(Long crewId);
 
-	@Query(value = "{ 'crewId': ?0, 'createdAt': { $gte: ?1, $lt: ?2 } }", count = true)
+	@Query(value = "{ 'crewId': ?0, 'entryExitNotice': null, 'createdAt': { $gte: ?1, $lt: ?2 } }", count = true)
 	Mono<Long> countByCrewIdAndCreatedAtBetween(Long crewId, Instant start, Instant end);
 
 	// @Query(value = "{ 'crewId': ?0, 'entryExitNotice': null }",

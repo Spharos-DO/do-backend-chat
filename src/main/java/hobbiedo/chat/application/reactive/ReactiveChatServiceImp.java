@@ -58,7 +58,7 @@ public class ReactiveChatServiceImp implements ReactiveChatService {
 						return chatRepository.countByCrewIdAndCreatedAtBetween(crewId, lastReadAt,
 								latestChatCreatedAt)
 							.flatMap(count -> unreadCountService.initializeUnreadCount(crewId, uuid,
-								count - 1))
+								count))
 							.thenMany(processNewChats(crewId, uuid, latestChatCreatedAt,
 								chatLastStatus.getId()));
 					});
