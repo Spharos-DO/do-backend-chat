@@ -14,7 +14,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import hobbiedo.chat.domain.Chat;
 import hobbiedo.chat.domain.ChatLastStatus;
@@ -26,7 +25,7 @@ import hobbiedo.chat.dto.response.ChatListDTO;
 import hobbiedo.chat.dto.response.LastChatDTO;
 import hobbiedo.chat.infrastructure.mvc.ChatLastStatusRepository;
 import hobbiedo.chat.infrastructure.mvc.ChatRepository;
-import hobbiedo.chat.kafka.dto.ChatEntryExitDTO;
+import hobbiedo.chat.kafka.dto.CrewEntryExitDTO;
 import hobbiedo.global.exception.GlobalException;
 import hobbiedo.global.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
@@ -120,12 +119,12 @@ public class ChatServiceImp implements ChatService {
 	}
 
 	@Override
-	public void createChatStatus(ChatEntryExitDTO chatEntryExitDTO) {
+	public void createChatStatus(CrewEntryExitDTO chatEntryExitDTO) {
 		chatStatusRepository.save(chatEntryExitDTO.toChatLastStatusEntity());
 	}
 
 	@Override
-	public void deleteChatStatus(ChatEntryExitDTO chatEntryExitDTO) {
+	public void deleteChatStatus(CrewEntryExitDTO chatEntryExitDTO) {
 		chatStatusRepository.deleteByCrewIdAndUuid(chatEntryExitDTO.getCrewId(),
 			chatEntryExitDTO.getUuid());
 	}

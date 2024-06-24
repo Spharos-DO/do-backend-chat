@@ -25,11 +25,21 @@ public class UnreadCountService {
 		return reactiveRedisTemplate.opsForValue().increment(key).then();
 	}
 
+	public Mono<Void> decrementUnreadCount(long crewId, String uuid) {
+		String key = getUnreadCountKey(crewId, uuid);
+		return reactiveRedisTemplate.opsForValue().decrement(key).then();
+	}
+
 	public Mono<Long> getUnreadCount(long crewId, String uuid) {
 		String key = getUnreadCountKey(crewId, uuid);
 		return reactiveRedisTemplate.opsForValue().get(key)
 			.map(Long::valueOf)
 			.switchIfEmpty(Mono.just(0L));
+	}
+
+	public Mono<Void> deleteUnreadCount(long crewId, String uuid) {
+		String key = getUnreadCountKey(crewId, uuid);
+		return reactiveRedisTemplate.opsForValue().delete(key).then();
 	}
 
 }

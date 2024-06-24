@@ -23,26 +23,15 @@ public interface ReactiveChatRepository extends ReactiveMongoRepository<Chat, St
 		fields = "{ 'id': 0, 'uuid': 0 }")
 	Flux<Chat> findByCrewIdAndCreatedAtAfter(Long crewId, Instant since);
 
+	@Tailable
 	@Aggregation(pipeline = {
 		"{ '$match': { 'crewId': ?0, 'entryExitNotice': null } }",
 		"{ '$sort': { 'createdAt': -1 } }",
-		"{ '$limit': 1 }",
-		"{ '$project': { 'createdAt': 1 } }"
+		"{ '$limit': 1 }"
 	})
-	Mono<Chat> findLatestByCrewId(Long crewId);
+	Flux<Chat> findLatestByCrewId(Long crewId);
 
 	@Query(value = "{ 'crewId': ?0, 'createdAt': { $gte: ?1, $lt: ?2 } }", count = true)
 	Mono<Long> countByCrewIdAndCreatedAtBetween(Long crewId, Instant start, Instant end);
-
-	// @Query(value = "{ 'crewId': ?0, 'entryExitNotice': null }",
-	// 	sort = "{ 'createdAt': -1 }", fields = "{ 'createdAt': 1 }")
-
-	// @Aggregation(pipeline = {
-	// 	"{ '$match': { 'uuid': ?0 } }",
-	// 	"{ '$sort': { 'createdAt': -1 } }",
-	// 	"{ '$group': { '_id': '$crewId', 'latestChat': { '$first': '$$ROOT' } } }",
-	// 	"{ '$project': { 'crewId': '$_id', 'createdAt': '$latestChat.createdAt' } }"
-	// })
-	// Flux<Chat> findLatestChatsByUuid(String uuid);
 
 }

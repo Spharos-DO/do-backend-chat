@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChatEntryExitDTO {
+public class CrewEntryExitDTO {
 	private long crewId;
 	private String uuid;
 	private EntryExitType entryExitType;
