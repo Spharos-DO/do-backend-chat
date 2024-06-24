@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -13,10 +14,8 @@ import hobbiedo.chat.domain.Chat;
 
 public interface ChatRepository extends MongoRepository<Chat, String> {
 	@Query("{ 'crewId': ?0, 'createdAt': { '$gte': ?1, '$lt': ?2 } }")
-	List<Chat> findLastChatByCrewId(Long crewId, Instant joinTime, Instant lastReadAt, Pageable pageable);
-
-	@Query(value = "{ 'crewId': ?0, 'createdAt': { '$lt': ?1 } }", count = true)
-	int countByCrewIdAndCreatedAtBefore(Long crewId, Instant lastReadAt);
+	Page<Chat> findLastChatByCrewId(Long crewId, Instant joinTime, Instant lastReadAt,
+		Pageable pageable);
 
 	@Aggregation(pipeline = {
 		"{ '$match': { 'crewId': ?0, 'entryExitNotice': null } }",

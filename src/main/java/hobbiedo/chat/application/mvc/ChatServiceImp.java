@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -46,19 +47,16 @@ public class ChatServiceImp implements ChatService {
 		Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdAt")));
 		Instant lastReadAt = getLastReadAt(uuid, crewId);
 		Instant joinTime = chatJoinTimeRepository.findJoinTimeByUuidAndCrewId(uuid, crewId)
-			.orElseThrow(() -> new GlobalException(ErrorStatus.NO_EXIST_JOIN_TIME));
+			.orElseThrow(() -> new GlobalException(ErrorStatus.NO_EXIST_JOIN_TIME))
+			.getJoinTime();
 
-		List<Chat> chatList = chatRepository.findLastChatByCrewId(crewId, joinTime, lastReadAt,
+		Page<Chat> chatPage = chatRepository.findLastChatByCrewId(crewId, joinTime, lastReadAt,
 			pageable);
-		if (chatList.isEmpty()) {
+		if (chatPage.isEmpty()) {
 			throw new GlobalException(ErrorStatus.NO_EXIST_CHAT);
 		}
 
-		// 전체 페이지 수 계산 (위에서 채팅이 없을 경우 에러처리 했으니, Long 말고 long 사용)
-		int totalChats = chatRepository.countByCrewIdAndCreatedAtBefore(crewId, lastReadAt);
-		int lastPage = (int)Math.ceil((double)totalChats / size) - 1;
-
-		List<ChatListDTO> chatListDtos = chatList.stream()
+		List<ChatListDTO> chatListDtos = chatPage.getContent().stream()
 			.collect(Collectors.groupingBy(
 				chat -> LocalDate.ofInstant(chat.getCreatedAt(), ZoneId.systemDefault())))
 			.entrySet().stream()
@@ -71,7 +69,7 @@ public class ChatServiceImp implements ChatService {
 					.toList()))
 			.toList();
 
-		return ChatHistoryDTO.toDto(lastPage, chatListDtos);
+		return ChatHistoryDTO.toDto(chatPage.getTotalPages() - 1, chatListDtos);
 	}
 
 	@Override
