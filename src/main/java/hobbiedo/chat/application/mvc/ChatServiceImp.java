@@ -24,7 +24,6 @@ import hobbiedo.chat.dto.response.ChatHistoryDTO;
 import hobbiedo.chat.dto.response.ChatImageDTO;
 import hobbiedo.chat.dto.response.ChatImageListDTO;
 import hobbiedo.chat.dto.response.ChatListDTO;
-import hobbiedo.chat.dto.response.LastChatDTO;
 import hobbiedo.chat.infrastructure.mvc.ChatJoinTimeRepository;
 import hobbiedo.chat.infrastructure.mvc.ChatLastStatusRepository;
 import hobbiedo.chat.infrastructure.mvc.ChatRepository;
@@ -70,31 +69,6 @@ public class ChatServiceImp implements ChatService {
 			.toList();
 
 		return ChatHistoryDTO.toDto(chatPage.getTotalPages() - 1, chatListDtos);
-	}
-
-	@Override
-	public List<LastChatDTO> getChatList(String uuid) { // true 값을 때 0으로 보낼지 변경 후처리
-		List<ChatLastStatus> crewIdList = chatStatusRepository.findByUuid(uuid);
-		if (crewIdList.isEmpty()) {
-			throw new GlobalException(ErrorStatus.NO_EXIST_CHAT_UNREAD_STATUS);
-		}
-
-		return crewIdList.stream()
-			.map(chatStatus -> {
-				Long crewId = chatStatus.getCrewId();
-				// 채팅방의 마지막 메시지 조회
-				Chat lastChat = chatRepository.findLastChatByCrewId(crewId)
-					.orElseThrow(() -> new GlobalException(ErrorStatus.NO_EXIST_CHAT));
-				String content = lastChat.getImageUrl() != null ? "사진을 보냈습니다." : lastChat.getText();
-				// 안 읽은 메시지 개수 조회
-				long count = chatRepository.countByCrewIdAndCreatedAtAfter(crewId,
-					getLastReadAt(uuid, crewId));
-				int cnt = count > 999 ? 999 : (int)count;
-
-				return LastChatDTO.toDto(crewId, content, cnt, lastChat.getCreatedAt());
-			})
-			.sorted(Comparator.comparing(LastChatDTO::getCreatedAt).reversed())
-			.toList();
 	}
 
 	private Instant getLastReadAt(String uuid, Long crewId) {
@@ -147,4 +121,29 @@ public class ChatServiceImp implements ChatService {
 		Instant expiryDate = expiryDateTime.atZone(ZoneId.systemDefault()).toInstant();
 		chatRepository.deleteByImageUrlExistsAndCreatedAtBefore(expiryDate);
 	}
+
+	// @Override
+	// public List<LastChatDTO> getChatList(String uuid) { // true 값을 때 0으로 보낼지 변경 후처리
+	// 	List<ChatLastStatus> crewIdList = chatStatusRepository.findByUuid(uuid);
+	// 	if (crewIdList.isEmpty()) {
+	// 		throw new GlobalException(ErrorStatus.NO_EXIST_CHAT_UNREAD_STATUS);
+	// 	}
+	//
+	// 	return crewIdList.stream()
+	// 		.map(chatStatus -> {
+	// 			Long crewId = chatStatus.getCrewId();
+	// 			// 채팅방의 마지막 메시지 조회
+	// 			Chat lastChat = chatRepository.findLastChatByCrewId(crewId)
+	// 				.orElseThrow(() -> new GlobalException(ErrorStatus.NO_EXIST_CHAT));
+	// 			String content = lastChat.getImageUrl() != null ? "사진을 보냈습니다." : lastChat.getText();
+	// 			// 안 읽은 메시지 개수 조회
+	// 			long count = chatRepository.countByCrewIdAndCreatedAtAfter(crewId,
+	// 				getLastReadAt(uuid, crewId));
+	// 			int cnt = count > 999 ? 999 : (int)count;
+	//
+	// 			return LastChatDTO.toDto(crewId, content, cnt, lastChat.getCreatedAt());
+	// 		})
+	// 		.sorted(Comparator.comparing(LastChatDTO::getCreatedAt).reversed())
+	// 		.toList();
+	// }
 }
