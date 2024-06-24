@@ -10,5 +10,5 @@ import hobbiedo.chat.domain.ChatJoinTime;
 
 public interface ChatJoinTimeRepository extends MongoRepository<ChatJoinTime, String> {
 	@Query(value = "{'uuid': ?0, 'crewId': ?1}", fields = "{'joinTime': 1}")
-	Optional<Instant> findJoinTimeByUuidAndCrewId(String uuid, Long crewId);
+	Optional<ChatJoinTime> findJoinTimeByUuidAndCrewId(String uuid, Long crewId);
 }
