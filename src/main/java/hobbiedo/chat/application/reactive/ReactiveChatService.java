@@ -18,5 +18,7 @@ public interface ReactiveChatService {
 
 	Mono<Void> updateLastStatusAt(LastStatusModifyDTO lastStatusModifyDTO, String uuid);
 
-	Mono<Void> sendEntryExitChat(ChatEntryExitDTO entryExitDTO);
+	Mono<Void> createEntryChatAndJoinTime(ChatEntryExitDTO entryExitDTO);
+
+	Mono<Void> createExitChatAndDeleteJoinTime(ChatEntryExitDTO entryExitDTO);
 }

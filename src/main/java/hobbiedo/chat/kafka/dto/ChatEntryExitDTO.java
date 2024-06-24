@@ -3,6 +3,7 @@ package hobbiedo.chat.kafka.dto;
 import java.time.Instant;
 
 import hobbiedo.chat.domain.Chat;
+import hobbiedo.chat.domain.ChatJoinTime;
 import hobbiedo.chat.domain.ChatLastStatus;
 import hobbiedo.chat.kafka.type.EntryExitType;
 import lombok.AllArgsConstructor;
@@ -32,6 +33,14 @@ public class ChatEntryExitDTO {
 			.crewId(crewId)
 			.connectionStatus(false)
 			.lastReadAt(Instant.now())
+			.build();
+	}
+
+	public ChatJoinTime toChatJoinTimeEntity(Instant createdAt) {
+		return ChatJoinTime.builder()
+			.uuid(uuid)
+			.crewId(crewId)
+			.joinTime(createdAt)
 			.build();
 	}
 }
