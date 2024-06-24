@@ -18,7 +18,7 @@ public class ReactiveGlobalExceptionHandler {
 	protected Mono<BaseResponse<?>> baseError(GlobalException ex, ServerHttpRequest request) {
 		log.error("errorStatus: {}, url: {}, message: {}", ex.getStatus(), request.getURI(),
 			ex.getMessage());
-		return Mono.just(BaseResponse.onFailure(ex.getStatus(), ex.getMessage()));
+		return Mono.just(BaseResponse.onFailure(ex.getStatus()));
 	}
 
 	// RuntimeException의 경우 일반적인 에러 메시지를 사용하여 보안 유지
@@ -41,5 +41,14 @@ public class ReactiveGlobalExceptionHandler {
 		});
 
 		return Mono.just(BaseResponse.onFailure(ErrorStatus.BAD_REQUEST, builder.toString()));
+	}
+
+	@ExceptionHandler(Exception.class)
+	public Mono<BaseResponse<?>> allException(Exception ex,
+		ServerHttpRequest request) {
+		log.error("url: {}, message: {}", request.getURI(), ex.getMessage());
+
+		return Mono.just(
+			BaseResponse.onFailure(ErrorStatus.INTERNAL_SERVER_ERROR, ex.getMessage()));
 	}
 }
