@@ -51,7 +51,7 @@ public class ReactiveChatController {
 	}
 
 	@Operation(summary = "(채팅방 리스트에서) 처음 마지막 채팅과 안읽음 개수 조회", description = "채팅방 리스트에서 채팅방당 마지막 채팅(1개)을 조회한다.")
-	@GetMapping( "/latest/{crewId}")
+	@GetMapping("/latest/{crewId}")
 	public Mono<BaseResponse<LastChatInfoDTO>> getLatestChats(@PathVariable Long crewId,
 		@RequestHeader(name = "Uuid") String uuid) {
 		return chatService.getOneLatestChat(crewId, uuid)
