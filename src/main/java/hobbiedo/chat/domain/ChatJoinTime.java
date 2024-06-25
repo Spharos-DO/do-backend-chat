@@ -2,36 +2,29 @@ package hobbiedo.chat.domain;
 
 import java.time.Instant;
 
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Document(collection = "ChatLastStatus")
+@Document(collection = "ChatJoinTime")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @CompoundIndex(name = "uuid_crewId_idx", def = "{'uuid': 1, 'crewId': 1}")
-public class ChatLastStatus {
-	@Id
+public class ChatJoinTime {
 	private String id;
 	private String uuid;
 	private Long crewId;
-	private boolean connectionStatus;
-	private Instant lastReadAt;
+	private Instant joinTime;
 
 	@Builder
-	public ChatLastStatus(String id, String uuid, Long crewId, boolean connectionStatus,
-		Instant lastReadAt) {
+	public ChatJoinTime(String id, String uuid, Long crewId, Instant joinTime) {
 		this.id = id;
 		this.uuid = uuid;
 		this.crewId = crewId;
-		this.connectionStatus = connectionStatus;
-		this.lastReadAt = lastReadAt;
+		this.joinTime = joinTime;
 	}
 }

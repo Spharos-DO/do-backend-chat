@@ -45,17 +45,16 @@ public class ReactiveChatController {
 		return chatService.getStreamChat(crewId, uuid)
 			.map(chatStreamDTO -> BaseResponse.onSuccess(SuccessStatus.FIND_CHAT_CONTENT,
 				chatStreamDTO));
-		//	.subscribeOn(Schedulers.boundedElastic());
 	}
 
-	@Operation(summary = "(채팅방 리스트에서) 실시간 마지막 채팅과 안읽음 개수 조회", description = "채팅방 리스트에서 채팅방당 실시간으로 업데이트 되는 내역을 조회한다.")
+	@Operation(summary = "(채팅방 리스트에서) 실시간 마지막 채팅과 안읽음 개수 조회",
+		description = "채팅방 리스트에서 채팅방당 처음 마지막 채팅과 실시간 업데이트 채팅을 조회한다.")
 	@GetMapping(value = "/latest/stream/{crewId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	public Flux<BaseResponse<LastChatInfoDTO>> getLatestChats(@PathVariable Long crewId,
+	public Flux<BaseResponse<LastChatInfoDTO>> getStreamLatestChats(@PathVariable Long crewId,
 		@RequestHeader(name = "Uuid") String uuid) {
-		return chatService.getStreamLatestChat(crewId, uuid)
+		return chatService.getLatestChatAndStream(crewId, uuid)
 			.map(lastChatInfoDTO -> BaseResponse.onSuccess(SuccessStatus.FIND_LAST_CHAT,
 				lastChatInfoDTO));
-		//.subscribeOn(Schedulers.boundedElastic());
 	}
 
 	@Operation(summary = "채팅방 접속 여부 변경",
@@ -67,14 +66,4 @@ public class ReactiveChatController {
 		return chatService.updateLastStatusAt(lastStatusModifyDTO, uuid)
 			.then(Mono.just(BaseResponse.onSuccess(SuccessStatus.UPDATE_CONNECTION_STATUS, null)));
 	}
-
-	// 	@Operation(summary = "(한 유저의 특정 소모임에서) 안 읽은 채팅 개수 조회",
-	// 		description = "채팅방 리스트에서 한 유저가 특정 소모임에 대한 안읽은 채팅 메시지의 개수를 조회한다.")
-	// 	@GetMapping("/unread-count/{crewId}")
-	// 	public Mono<BaseResponse<UnReadCountDTO>> getUnreadCount(@PathVariable Long crewId,
-	// 		@RequestHeader String uuid) {
-	// 		return chatService.getUnreadCount(crewId, uuid)
-	// 			.map(unReadCountDTO -> BaseResponse.onSuccess(SuccessStatus.FIND_UNREAD_COUNT,
-	// 				unReadCountDTO));
-	// 	}
 }

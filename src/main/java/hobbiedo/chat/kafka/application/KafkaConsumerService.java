@@ -20,8 +20,9 @@ public class KafkaConsumerService {
 		"join-crew-topic"}, groupId = "${spring.kafka.consumer.group-id}",
 		containerFactory = "crewEntryExitKafkaListenerContainerFactory")
 	public void listenToScoreAddTopic(ChatEntryExitDTO eventDto) {
-		chatService.createChatStatus(eventDto);
-		reactiveChatService.sendEntryExitChat(eventDto).subscribe();
+		reactiveChatService.createEntryChatAndJoinTime(eventDto)
+			.doOnSuccess(chat -> chatService.createChatStatus(eventDto))
+			.subscribe();
 	}
 
 	// 소모임 회원 입퇴장 채팅 알림 전송
@@ -29,7 +30,7 @@ public class KafkaConsumerService {
 		"force-exit-crew-topic"}, groupId = "${spring.kafka.consumer.group-id}",
 		containerFactory = "crewEntryExitKafkaListenerContainerFactory")
 	public void listenToSendEntryExitChatTopic(ChatEntryExitDTO eventDto) {
-		reactiveChatService.sendEntryExitChat(eventDto).subscribe();
 		chatService.deleteChatStatus(eventDto);
+		reactiveChatService.createExitChatAndDeleteJoinTime(eventDto).subscribe();
 	}
 }

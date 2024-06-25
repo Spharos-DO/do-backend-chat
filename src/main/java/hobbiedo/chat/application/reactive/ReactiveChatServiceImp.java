@@ -9,6 +9,7 @@ import hobbiedo.chat.dto.request.ChatSendDTO;
 import hobbiedo.chat.dto.request.LastStatusModifyDTO;
 import hobbiedo.chat.dto.response.ChatStreamDTO;
 import hobbiedo.chat.dto.response.LastChatInfoDTO;
+import hobbiedo.chat.infrastructure.reactive.ReactiveChatJoinTimeRepository;
 import hobbiedo.chat.infrastructure.reactive.ReactiveChatLastStatusRepository;
 import hobbiedo.chat.infrastructure.reactive.ReactiveChatRepository;
 import hobbiedo.chat.kafka.dto.ChatEntryExitDTO;
@@ -24,6 +25,7 @@ public class ReactiveChatServiceImp implements ReactiveChatService {
 	private final ReactiveChatRepository chatRepository;
 	private final ReactiveChatLastStatusRepository chatLastStatusRepository;
 	private final UnreadCountService unreadCountService;
+	private final ReactiveChatJoinTimeRepository chatJoinTimeRepository;
 
 	@Override
 	public Mono<Void> sendChat(ChatSendDTO chatSendDTO,
@@ -43,7 +45,7 @@ public class ReactiveChatServiceImp implements ReactiveChatService {
 			.map(ChatStreamDTO::toDto);
 	}
 
-	public Flux<LastChatInfoDTO> getStreamLatestChat(Long crewId, String uuid) {
+	public Flux<LastChatInfoDTO> getLatestChatAndStream(Long crewId, String uuid) {
 		return chatRepository.findLatestByCrewId(crewId)
 			.switchIfEmpty(Mono.error(new GlobalException(ErrorStatus.NO_FIND_LAST_CHAT)))
 			.flatMapMany(latestChat -> {
@@ -56,26 +58,30 @@ public class ReactiveChatServiceImp implements ReactiveChatService {
 						return chatRepository.countByCrewIdAndCreatedAtBetween(crewId, lastReadAt,
 								latestChatCreatedAt)
 							.flatMap(count -> unreadCountService.initializeUnreadCount(crewId, uuid,
-								count))
-							.thenMany(processNewChats(crewId, uuid, latestChatCreatedAt,
-								chatLastStatus.getId()));
+								Math.min(count, 999)))
+							.then(unreadCountService.getUnreadCount(crewId, uuid))
+							.flatMap(unreadCount -> setLastChatContent(latestChat)
+								.map(lastChatContent -> LastChatInfoDTO.toDTO(latestChat,
+									lastChatContent,
+									chatLastStatus.isConnectionStatus() ? 0 :
+										unreadCount.intValue())))
+							.flux()
+							.concatWith(getStreamedChats(crewId, uuid, latestChatCreatedAt));
 					});
 			});
 	}
 
-	private Flux<LastChatInfoDTO> processNewChats(Long crewId, String uuid,
-		Instant latestChatCreatedAt, String chatLastStatusId) {
+	private Flux<LastChatInfoDTO> getStreamedChats(Long crewId, String uuid,
+		Instant latestChatCreatedAt) {
 		return chatRepository.findByCrewIdAndCreatedAtAfter(crewId, latestChatCreatedAt)
-			.flatMap(chat -> unreadCountService.incrementUnreadCount(crewId, uuid)
-				.thenReturn(chat))
+			.flatMap(chat -> unreadCountService.incrementUnreadCount(crewId, uuid).thenReturn(chat))
 			.flatMap(chat -> unreadCountService.getUnreadCount(crewId, uuid)
-				.flatMap(unreadCount -> chatLastStatusRepository.findById(chatLastStatusId)
+				.flatMap(unreadCount -> chatLastStatusRepository.findByCrewIdAndUuid(crewId, uuid)
 					.switchIfEmpty(
 						Mono.error(new GlobalException(ErrorStatus.NO_FIND_CHAT_UNREAD_STATUS)))
 					.flatMap(chatLastStatus -> setLastChatContent(chat)
-							.map(lastChatContent -> LastChatInfoDTO.toDTO(chat, lastChatContent,
-								chatLastStatus.isConnectionStatus() ? 0 : unreadCount.intValue()))
-						// 0: 접속중
+						.map(lastChatContent -> LastChatInfoDTO.toDTO(chat, lastChatContent,
+							chatLastStatus.isConnectionStatus() ? 0 : unreadCount.intValue()))
 					)
 				)
 			);
@@ -93,17 +99,29 @@ public class ReactiveChatServiceImp implements ReactiveChatService {
 	@Override
 	public Mono<Void> updateLastStatusAt(LastStatusModifyDTO lastStatusModifyDTO, String uuid) {
 		return chatLastStatusRepository.findByCrewIdAndUuid(lastStatusModifyDTO.getCrewId(), uuid)
+			.switchIfEmpty(Mono.error(new GlobalException(ErrorStatus.NO_FIND_CHAT_UNREAD_STATUS)))
 			.flatMap(chatUnReadStatus -> chatLastStatusRepository
 				.save(lastStatusModifyDTO.toEntity(chatUnReadStatus)))
-			.switchIfEmpty(Mono.error(new GlobalException(ErrorStatus.NO_FIND_CHAT_UNREAD_STATUS)))
 			.onErrorMap(e -> new GlobalException(ErrorStatus.INTERNAL_SERVER_ERROR, e.getMessage()))
 			.then();
 	}
 
 	@Override
-	public Mono<Void> sendEntryExitChat(ChatEntryExitDTO entryExitDTO) {
+	public Mono<Void> createEntryChatAndJoinTime(ChatEntryExitDTO entryExitDTO) {
 		return chatRepository.save(entryExitDTO.toChatEntity())
+			.flatMap(chat -> chatJoinTimeRepository.save(
+				entryExitDTO.toChatJoinTimeEntity(chat.getCreatedAt())))
 			.then()
+			.onErrorMap(
+				e -> new GlobalException(ErrorStatus.INTERNAL_SERVER_ERROR, e.getMessage()));
+	}
+
+	@Override
+	public Mono<Void> createExitChatAndDeleteJoinTime(ChatEntryExitDTO entryExitDTO) {
+		return chatRepository.save(entryExitDTO.toChatEntity())
+			.flatMap(chat -> chatJoinTimeRepository.findByUuidAndCrewId(entryExitDTO.getUuid(),
+					entryExitDTO.getCrewId())
+				.flatMap(chatJoinTimeRepository::delete))
 			.onErrorMap(
 				e -> new GlobalException(ErrorStatus.INTERNAL_SERVER_ERROR, e.getMessage()));
 	}
