@@ -1,7 +1,5 @@
 package hobbiedo.chat.application.reactive;
 
-import java.time.Instant;
-
 import hobbiedo.chat.dto.request.ChatSendDTO;
 import hobbiedo.chat.dto.request.LastStatusModifyDTO;
 import hobbiedo.chat.dto.response.ChatStreamDTO;
@@ -16,10 +14,7 @@ public interface ReactiveChatService {
 
 	Flux<ChatStreamDTO> getStreamChat(Long crewId, String uuid);
 
-	Mono<LastChatInfoDTO> getOneLatestChat(Long crewId, String uuid);
-
-	Flux<LastChatInfoDTO> getStreamLatestChat(Long crewId, String uuid,
-		Instant latestChatCreatedAt);
+	Flux<LastChatInfoDTO> getLatestChatAndStream(Long crewId, String uuid);
 
 	Mono<Void> updateLastStatusAt(LastStatusModifyDTO lastStatusModifyDTO, String uuid);
 

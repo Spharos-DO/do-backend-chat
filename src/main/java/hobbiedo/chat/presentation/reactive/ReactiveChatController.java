@@ -1,7 +1,5 @@
 package hobbiedo.chat.presentation.reactive;
 
-import java.time.Instant;
-
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,7 +8,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import hobbiedo.chat.application.reactive.ReactiveChatService;
@@ -50,21 +47,13 @@ public class ReactiveChatController {
 				chatStreamDTO));
 	}
 
-	@Operation(summary = "(채팅방 리스트에서) 처음 마지막 채팅과 안읽음 개수 조회", description = "채팅방 리스트에서 채팅방당 마지막 채팅(1개)을 조회한다.")
-	@GetMapping("/latest/{crewId}")
-	public Mono<BaseResponse<LastChatInfoDTO>> getLatestChats(@PathVariable Long crewId,
-		@RequestHeader(name = "Uuid") String uuid) {
-		return chatService.getOneLatestChat(crewId, uuid)
-			.map(lastChatInfoDTO -> BaseResponse.onSuccess(SuccessStatus.FIND_LAST_CHAT,
-				lastChatInfoDTO));
-	}
-
-	@Operation(summary = "(채팅방 리스트에서) 실시간 마지막 채팅과 안읽음 개수 조회", description = "채팅방 리스트에서 채팅방당 실시간 업데이트 채팅을 조회한다.")
+	@Operation(summary = "(채팅방 리스트에서) 실시간 마지막 채팅과 안읽음 개수 조회",
+		description = "채팅방 리스트에서 채팅방당 처음 마지막 채팅과 실시간 업데이트 채팅을 조회한다.")
 	@GetMapping(value = "/latest/stream/{crewId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public Flux<BaseResponse<LastChatInfoDTO>> getStreamLatestChats(@PathVariable Long crewId,
-		@RequestHeader(name = "Uuid") String uuid, @RequestParam Instant latestChatCreatedAt) {
-		return chatService.getStreamLatestChat(crewId, uuid, latestChatCreatedAt)
-			.map(lastChatInfoDTO -> BaseResponse.onSuccess(SuccessStatus.FIND_STREAM_LAST_CHAT,
+		@RequestHeader(name = "Uuid") String uuid) {
+		return chatService.getLatestChatAndStream(crewId, uuid)
+			.map(lastChatInfoDTO -> BaseResponse.onSuccess(SuccessStatus.FIND_LAST_CHAT,
 				lastChatInfoDTO));
 	}
 
@@ -77,14 +66,4 @@ public class ReactiveChatController {
 		return chatService.updateLastStatusAt(lastStatusModifyDTO, uuid)
 			.then(Mono.just(BaseResponse.onSuccess(SuccessStatus.UPDATE_CONNECTION_STATUS, null)));
 	}
-
-	// 	@Operation(summary = "(한 유저의 특정 소모임에서) 안 읽은 채팅 개수 조회",
-	// 		description = "채팅방 리스트에서 한 유저가 특정 소모임에 대한 안읽은 채팅 메시지의 개수를 조회한다.")
-	// 	@GetMapping("/unread-count/{crewId}")
-	// 	public Mono<BaseResponse<UnReadCountDTO>> getUnreadCount(@PathVariable Long crewId,
-	// 		@RequestHeader String uuid) {
-	// 		return chatService.getUnreadCount(crewId, uuid)
-	// 			.map(unReadCountDTO -> BaseResponse.onSuccess(SuccessStatus.FIND_UNREAD_COUNT,
-	// 				unReadCountDTO));
-	// 	}
 }

@@ -45,45 +45,43 @@ public class ReactiveChatServiceImp implements ReactiveChatService {
 			.map(ChatStreamDTO::toDto);
 	}
 
-	@Override
-	public Mono<LastChatInfoDTO> getOneLatestChat(Long crewId, String uuid) {
+	public Flux<LastChatInfoDTO> getLatestChatAndStream(Long crewId, String uuid) {
 		return chatRepository.findLatestByCrewId(crewId)
 			.switchIfEmpty(Mono.error(new GlobalException(ErrorStatus.NO_FIND_LAST_CHAT)))
-			.flatMap(latestChat -> {
+			.flatMapMany(latestChat -> {
 				Instant latestChatCreatedAt = latestChat.getCreatedAt();
 				return chatLastStatusRepository.findByCrewIdAndUuid(crewId, uuid)
 					.switchIfEmpty(
 						Mono.error(new GlobalException(ErrorStatus.NO_FIND_CHAT_UNREAD_STATUS)))
-					.flatMap(chatLastStatus -> {
+					.flatMapMany(chatLastStatus -> {
 						Instant lastReadAt = chatLastStatus.getLastReadAt();
 						return chatRepository.countByCrewIdAndCreatedAtBetween(crewId, lastReadAt,
 								latestChatCreatedAt)
 							.flatMap(count -> unreadCountService.initializeUnreadCount(crewId, uuid,
 								Math.min(count, 999)))
-							.then(unreadCountService.getUnreadCount(crewId, uuid)
-								.flatMap(unreadCount -> setLastChatContent(latestChat)
-									.map(lastChatContent -> LastChatInfoDTO.toDTO(latestChat,
-										lastChatContent,
-										chatLastStatus.isConnectionStatus() ? 0 :
-											unreadCount.intValue()))));
+							.then(unreadCountService.getUnreadCount(crewId, uuid))
+							.flatMap(unreadCount -> setLastChatContent(latestChat)
+								.map(lastChatContent -> LastChatInfoDTO.toDTO(latestChat,
+									lastChatContent,
+									chatLastStatus.isConnectionStatus() ? 0 :
+										unreadCount.intValue())))
+							.flux()
+							.concatWith(getStreamedChats(crewId, uuid, latestChatCreatedAt));
 					});
 			});
 	}
 
-	@Override
-	public Flux<LastChatInfoDTO> getStreamLatestChat(Long crewId, String uuid,
+	private Flux<LastChatInfoDTO> getStreamedChats(Long crewId, String uuid,
 		Instant latestChatCreatedAt) {
 		return chatRepository.findByCrewIdAndCreatedAtAfter(crewId, latestChatCreatedAt)
-			.flatMap(chat -> unreadCountService.incrementUnreadCount(crewId, uuid)
-				.thenReturn(chat))
+			.flatMap(chat -> unreadCountService.incrementUnreadCount(crewId, uuid).thenReturn(chat))
 			.flatMap(chat -> unreadCountService.getUnreadCount(crewId, uuid)
 				.flatMap(unreadCount -> chatLastStatusRepository.findByCrewIdAndUuid(crewId, uuid)
 					.switchIfEmpty(
 						Mono.error(new GlobalException(ErrorStatus.NO_FIND_CHAT_UNREAD_STATUS)))
 					.flatMap(chatLastStatus -> setLastChatContent(chat)
-							.map(lastChatContent -> LastChatInfoDTO.toDTO(chat, lastChatContent,
-								chatLastStatus.isConnectionStatus() ? 0 : unreadCount.intValue()))
-						// 0: 접속중
+						.map(lastChatContent -> LastChatInfoDTO.toDTO(chat, lastChatContent,
+							chatLastStatus.isConnectionStatus() ? 0 : unreadCount.intValue()))
 					)
 				)
 			);
