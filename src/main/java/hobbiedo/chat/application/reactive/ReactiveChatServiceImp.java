@@ -1,14 +1,12 @@
 package hobbiedo.chat.application.reactive;
 
-import java.time.Instant;
-
 import org.springframework.stereotype.Service;
 
 import hobbiedo.chat.domain.Chat;
 import hobbiedo.chat.dto.request.ChatSendDTO;
 import hobbiedo.chat.dto.request.LastStatusModifyDTO;
-import hobbiedo.chat.dto.response.ChatStreamDTO;
-import hobbiedo.chat.dto.response.LastChatInfoDTO;
+import hobbiedo.chat.dto.response.ChatDTO;
+import hobbiedo.chat.dto.response.LastChatDTO;
 import hobbiedo.chat.infrastructure.reactive.ReactiveChatJoinTimeRepository;
 import hobbiedo.chat.infrastructure.reactive.ReactiveChatLastStatusRepository;
 import hobbiedo.chat.infrastructure.reactive.ReactiveChatRepository;
@@ -24,7 +22,6 @@ import reactor.core.publisher.Mono;
 public class ReactiveChatServiceImp implements ReactiveChatService {
 	private final ReactiveChatRepository chatRepository;
 	private final ReactiveChatLastStatusRepository chatLastStatusRepository;
-	private final UnreadCountService unreadCountService;
 	private final ReactiveChatJoinTimeRepository chatJoinTimeRepository;
 
 	@Override
@@ -37,54 +34,55 @@ public class ReactiveChatServiceImp implements ReactiveChatService {
 	}
 
 	@Override
-	public Flux<ChatStreamDTO> getStreamChat(Long crewId, String uuid) {
+	public Flux<ChatDTO> getStreamChat(Long crewId, String uuid) {
 		return chatLastStatusRepository.findLastReadAtByCrewIdAndUuid(crewId, uuid)
 			.flatMapMany(
 				chatUnReadStatus -> chatRepository.findByCrewIdAndCreatedAtOrAfter(crewId,
 					chatUnReadStatus.getLastReadAt()))
-			.map(ChatStreamDTO::toDto);
+			.map(ChatDTO::toDto);
 	}
 
-	public Flux<LastChatInfoDTO> getLatestChatAndStream(Long crewId, String uuid) {
-		return chatRepository.findLatestByCrewId(crewId)
-			.switchIfEmpty(Mono.error(new GlobalException(ErrorStatus.NO_FIND_LAST_CHAT)))
-			.flatMapMany(latestChat -> {
-				Instant latestChatCreatedAt = latestChat.getCreatedAt();
-				return chatLastStatusRepository.findByCrewIdAndUuid(crewId, uuid)
-					.switchIfEmpty(
-						Mono.error(new GlobalException(ErrorStatus.NO_FIND_CHAT_UNREAD_STATUS)))
-					.flatMapMany(chatLastStatus -> {
-						Instant lastReadAt = chatLastStatus.getLastReadAt();
-						return chatRepository.countByCrewIdAndCreatedAtBetween(crewId, lastReadAt,
-								latestChatCreatedAt)
-							.flatMap(count -> unreadCountService.initializeUnreadCount(crewId, uuid,
-								Math.min(count, 999)))
-							.then(unreadCountService.getUnreadCount(crewId, uuid))
-							.flatMap(unreadCount -> setLastChatContent(latestChat)
-								.map(lastChatContent -> LastChatInfoDTO.toDTO(latestChat,
-									lastChatContent,
-									chatLastStatus.isConnectionStatus() ? 0 :
-										unreadCount.intValue())))
-							.flux()
-							.concatWith(getStreamedChats(crewId, uuid, latestChatCreatedAt));
-					});
-			});
-	}
-
-	private Flux<LastChatInfoDTO> getStreamedChats(Long crewId, String uuid,
-		Instant latestChatCreatedAt) {
-		return chatRepository.findByCrewIdAndCreatedAtAfter(crewId, latestChatCreatedAt)
-			.flatMap(chat -> unreadCountService.incrementUnreadCount(crewId, uuid).thenReturn(chat))
-			.flatMap(chat -> unreadCountService.getUnreadCount(crewId, uuid)
-				.flatMap(unreadCount -> chatLastStatusRepository.findByCrewIdAndUuid(crewId, uuid)
-					.switchIfEmpty(
-						Mono.error(new GlobalException(ErrorStatus.NO_FIND_CHAT_UNREAD_STATUS)))
-					.flatMap(chatLastStatus -> setLastChatContent(chat)
-						.map(lastChatContent -> LastChatInfoDTO.toDTO(chat, lastChatContent,
-							chatLastStatus.isConnectionStatus() ? 0 : unreadCount.intValue()))
-					)
+	public Flux<LastChatDTO> getLatestChatAndStream(Long crewId, String uuid) {
+		return chatJoinTimeRepository.findByUuidAndCrewId(uuid, crewId)
+			.switchIfEmpty(Mono.error(new GlobalException(ErrorStatus.NO_EXIST_JOIN_TIME)))
+			.flatMapMany(joinTime -> chatLastStatusRepository.findByCrewIdAndUuid(crewId, uuid)
+				.switchIfEmpty(
+					Mono.error(new GlobalException(ErrorStatus.NO_EXIST_CHAT_UNREAD_STATUS)))
+				.flatMapMany(
+					lastStatus -> chatRepository.findLatestByCrewId(crewId, joinTime.getJoinTime())
+						.switchIfEmpty(newCreateCrewChat(crewId, uuid))
+						.flatMap(latestChat -> setLastChatContent(latestChat)
+							.flatMap(
+								lastChatContent -> chatRepository.countByCrewIdAndCreatedAtBetween(
+										crewId, lastStatus.getLastReadAt(), latestChat.getCreatedAt())
+									.map(unreadCount -> LastChatDTO.toDTO(lastChatContent,
+										Math.min(999, unreadCount.intValue()),
+										latestChat.getCreatedAt()))
+							)
+						)
+						.flatMapMany(lastChatInfoDTO -> {
+							Flux<LastChatDTO> firstLastChat = Flux.just(lastChatInfoDTO);
+							Flux<Chat> streamLastChat = chatRepository.findByCrewIdAndCreatedAtAfter(
+								crewId, lastChatInfoDTO.getCreatedAt());
+							return firstLastChat.concatWith(
+								streamLastChat.flatMap(chat -> setLastChatContent(chat)
+									.map(content -> LastChatDTO.toDTO(content, null,
+										chat.getCreatedAt()))
+								));
+						})
 				)
 			);
+	}
+
+	private Mono<Chat> newCreateCrewChat(Long crewId, String uuid) {
+		return chatRepository.findFirstByCrewIdAndUuid(crewId, uuid)
+			.switchIfEmpty(Mono.error(new GlobalException(ErrorStatus.NO_FIND_LAST_CHAT)))
+			.map(firstChat -> Chat.builder()
+				.text("새로운 소모임 채팅방이 생성되었습니다.")
+				.crewId(crewId)
+				.uuid(uuid)
+				.createdAt(firstChat.getCreatedAt())
+				.build());
 	}
 
 	private Mono<String> setLastChatContent(Chat chat) {
@@ -125,20 +123,4 @@ public class ReactiveChatServiceImp implements ReactiveChatService {
 			.onErrorMap(
 				e -> new GlobalException(ErrorStatus.INTERNAL_SERVER_ERROR, e.getMessage()));
 	}
-
-	// public Flux<LastChatInfoDTO> getStreamLatestChat(Long crewId) {
-	// 	return chatRepository.findLatestByCrewId(crewId)
-	// 		.flatMapMany(latestChat ->
-	// 			chatRepository.findByCrewIdAndCreatedAtAfter(crewId, latestChat.getCreatedAt())
-	// 		)
-	// 		.flatMap(chat -> setLastChatContent(chat)
-	// 			.map(lastChatContent -> LastChatInfoDTO.toDTO(chat, lastChatContent)));
-	// }
-
-	// @Override
-	// public Mono<UnReadCountDTO> getUnreadCount(Long crewId, String uuid) {
-	// 	return chatUnReadStatusRepository.findByCrewIdAndUuid(crewId, uuid)
-	// 		.map(UnReadCountDTO::toDTO)
-	// 		.switchIfEmpty(Mono.error(new GlobalException(ErrorStatus.NO_FIND_CHAT_UNREAD_STATUS)));
-	// }
 }
