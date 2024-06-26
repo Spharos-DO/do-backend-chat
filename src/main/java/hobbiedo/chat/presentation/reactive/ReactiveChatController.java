@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 import hobbiedo.chat.application.reactive.ReactiveChatService;
 import hobbiedo.chat.dto.request.ChatSendDTO;
 import hobbiedo.chat.dto.request.LastStatusModifyDTO;
-import hobbiedo.chat.dto.response.ChatStreamDTO;
-import hobbiedo.chat.dto.response.LastChatInfoDTO;
+import hobbiedo.chat.dto.response.ChatDTO;
+import hobbiedo.chat.dto.response.LastChatDTO;
 import hobbiedo.global.base.BaseResponse;
 import hobbiedo.global.status.SuccessStatus;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,7 +40,7 @@ public class ReactiveChatController {
 
 	@Operation(summary = "(특정 소모임의) 실시간 채팅 내역 조회", description = "특정 시간(Instant)과 그 이후의 채팅 내역을 실시간으로 조회한다.")
 	@GetMapping(value = "/{crewId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	public Flux<BaseResponse<ChatStreamDTO>> getStreamChat(@PathVariable Long crewId,
+	public Flux<BaseResponse<ChatDTO>> getStreamChat(@PathVariable Long crewId,
 		@RequestHeader(name = "Uuid") String uuid) {
 		return chatService.getStreamChat(crewId, uuid)
 			.map(chatStreamDTO -> BaseResponse.onSuccess(SuccessStatus.FIND_CHAT_CONTENT,
@@ -50,7 +50,7 @@ public class ReactiveChatController {
 	@Operation(summary = "(채팅방 리스트에서) 실시간 마지막 채팅과 안읽음 개수 조회",
 		description = "채팅방 리스트에서 채팅방당 처음 마지막 채팅과 실시간 업데이트 채팅을 조회한다.")
 	@GetMapping(value = "/latest/stream/{crewId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	public Flux<BaseResponse<LastChatInfoDTO>> getStreamLatestChats(@PathVariable Long crewId,
+	public Flux<BaseResponse<LastChatDTO>> getStreamLatestChats(@PathVariable Long crewId,
 		@RequestHeader(name = "Uuid") String uuid) {
 		return chatService.getLatestChatAndStream(crewId, uuid)
 			.map(lastChatInfoDTO -> BaseResponse.onSuccess(SuccessStatus.FIND_LAST_CHAT,

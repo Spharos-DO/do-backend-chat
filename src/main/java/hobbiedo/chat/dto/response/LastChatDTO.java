@@ -2,23 +2,26 @@ package hobbiedo.chat.dto.response;
 
 import java.time.Instant;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Builder
 public class LastChatDTO {
-	private Long crewId;
 	private String lastChatContent;
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private Integer unreadCount;
 	private Instant createdAt;
 
-	public static LastChatDTO toDto(Long crewId, String lastChatContent, Integer unreadCount, Instant createdAt) {
+	public static LastChatDTO toDTO(String lastChatContent, Integer unreadCount,
+		Instant createdAt) {
 		return LastChatDTO.builder()
-			.crewId(crewId)
 			.lastChatContent(lastChatContent)
 			.unreadCount(unreadCount)
 			.createdAt(createdAt)
 			.build();
 	}
 }
+

@@ -24,13 +24,20 @@ public interface ReactiveChatRepository extends ReactiveMongoRepository<Chat, St
 	Flux<Chat> findByCrewIdAndCreatedAtAfter(Long crewId, Instant since);
 
 	@Aggregation(pipeline = {
-		"{ '$match': { 'crewId': ?0, 'entryExitNotice': null } }",
+		"{ '$match': { 'crewId': ?0, 'entryExitNotice': null, 'createdAt': { '$gt': ?1 } } }",
 		"{ '$sort': { 'createdAt': -1 } }",
 		"{ '$limit': 1 }"
 	})
-	Mono<Chat> findLatestByCrewId(Long crewId);
+	Mono<Chat> findLatestByCrewId(Long crewId, Instant joinTime);
 
-	@Query(value = "{ 'crewId': ?0, 'entryExitNotice': null, 'createdAt': { $gte: ?1, $lte: ?2 } }", count = true)
+	@Aggregation(pipeline = {
+		"{ '$match': { 'crewId': ?0, 'uuid': ?1, 'entryExitNotice': { '$exists': true } } }",
+		"{ '$sort': { 'createdAt': 1 } }",
+		"{ '$limit': 1 }"
+	})
+	Mono<Chat> findFirstByCrewIdAndUuid(Long crewId, String uuid);
+
+	@Query(value = "{ 'crewId': ?0, 'entryExitNotice': null, 'createdAt': { $gt: ?1, $lte: ?2 } }", count = true)
 	Mono<Long> countByCrewIdAndCreatedAtBetween(Long crewId, Instant start, Instant end);
 
 	// @Query(value = "{ 'crewId': ?0, 'entryExitNotice': null }",
