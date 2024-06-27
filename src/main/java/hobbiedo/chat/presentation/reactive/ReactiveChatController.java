@@ -57,6 +57,15 @@ public class ReactiveChatController {
 				lastChatInfoDTO));
 	}
 
+	@Operation(summary = "마지막 채팅 업데이트 알림",
+		description = "채팅방 리스트에서 회원이 속한 채팅방의 마지막 대화가 업데이트 됐다는 알림 신호를 받는다.")
+	@GetMapping(value = "/chat-list/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	public Flux<BaseResponse<String>> subscribeToChannel(
+		@RequestHeader(name = "Uuid") String uuid) {
+		return chatService.subscribeToChannelByUuid(uuid)
+			.map(pubMessage -> BaseResponse.onSuccess(SuccessStatus.UPDATE_LAST_CHAT, pubMessage));
+	}
+
 	@Operation(summary = "채팅방 접속 여부 변경",
 		description = "한 유저가 채팅방을 접속할 때와 나갈 때, 접속 여부를 변경한다.")
 	@PutMapping("/connection")

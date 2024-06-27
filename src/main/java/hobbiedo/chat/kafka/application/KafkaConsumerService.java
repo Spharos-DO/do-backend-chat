@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 
 import hobbiedo.chat.application.mvc.ChatService;
 import hobbiedo.chat.application.reactive.ReactiveChatService;
-import hobbiedo.chat.kafka.dto.ChatEntryExitDTO;
+import hobbiedo.chat.kafka.dto.CrewEntryExitDTO;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -19,7 +19,7 @@ public class KafkaConsumerService {
 	@KafkaListener(topics = {"create-crew-topic",
 		"join-crew-topic"}, groupId = "${spring.kafka.consumer.group-id}",
 		containerFactory = "crewEntryExitKafkaListenerContainerFactory")
-	public void listenToScoreAddTopic(ChatEntryExitDTO eventDto) {
+	public void listenToScoreAddTopic(CrewEntryExitDTO eventDto) {
 		reactiveChatService.createEntryChatAndJoinTime(eventDto)
 			.doOnSuccess(chat -> chatService.createChatStatus(eventDto))
 			.subscribe();
@@ -29,8 +29,9 @@ public class KafkaConsumerService {
 	@KafkaListener(topics = {"exit-crew-topic",
 		"force-exit-crew-topic"}, groupId = "${spring.kafka.consumer.group-id}",
 		containerFactory = "crewEntryExitKafkaListenerContainerFactory")
-	public void listenToSendEntryExitChatTopic(ChatEntryExitDTO eventDto) {
+	public void listenToSendEntryExitChatTopic(CrewEntryExitDTO eventDto) {
 		chatService.deleteChatStatus(eventDto);
 		reactiveChatService.createExitChatAndDeleteJoinTime(eventDto).subscribe();
+		reactiveChatService.deleteUnreadCount(eventDto).subscribe();
 	}
 }
