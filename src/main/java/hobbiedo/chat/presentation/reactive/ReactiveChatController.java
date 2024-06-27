@@ -47,7 +47,7 @@ public class ReactiveChatController {
 				chatStreamDTO));
 	}
 
-	@Operation(summary = "(채팅방 리스트에서) 실시간 마지막 채팅과 안읽음 개수 조회",
+	@Operation(summary = "크루 아이디로 채팅방 리스트 조회",
 		description = "채팅방 리스트에서 채팅방당 처음 마지막 채팅과 실시간 업데이트 채팅을 조회한다.")
 	@GetMapping(value = "/latest/stream/{crewId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public Flux<BaseResponse<LastChatDTO>> getStreamLatestChats(@PathVariable Long crewId,
@@ -57,7 +57,7 @@ public class ReactiveChatController {
 				lastChatInfoDTO));
 	}
 
-	@Operation(summary = "마지막 채팅 업데이트 알림",
+	@Operation(summary = "채팅 리스트 업데이트 알림",
 		description = "채팅방 리스트에서 회원이 속한 채팅방의 마지막 대화가 업데이트 됐다는 알림 신호를 받는다.")
 	@GetMapping(value = "/chat-list/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public Flux<BaseResponse<String>> subscribeToChannel(

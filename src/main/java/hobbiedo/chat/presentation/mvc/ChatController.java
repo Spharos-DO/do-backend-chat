@@ -38,7 +38,7 @@ public class ChatController {
 		}
 	}
 
-	@Operation(summary = "(채팅방 리스트에서) 마지막 채팅과 안읽음 개수 리스트 조회",
+	@Operation(summary = "한 회원의 채팅방 리스트 전체 조회",
 		description = "한 유저에 해당하는 전체 소모임 리스트의 마지막 채팅과 안읽음 개수를 조회한다.")
 	@GetMapping("/latest/list")
 	public BaseResponse<?> getLatestChatList(
