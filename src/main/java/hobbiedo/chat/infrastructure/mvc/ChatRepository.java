@@ -24,11 +24,11 @@ public interface ChatRepository extends MongoRepository<Chat, String> {
 	void deleteByImageUrlExistsAndCreatedAtBefore(Instant expiryDate);
 
 	@Aggregation(pipeline = {
-		"{ '$match': { 'crewId': ?0, 'entryExitNotice': null } }",
+		"{ '$match': { 'crewId': ?0, 'entryExitNotice': null, 'createdAt': { '$gt': ?1 } } }",
 		"{ '$sort': { 'createdAt': -1 } }",
 		"{ '$limit': 1 }"
 	})
-	Optional<Chat> findLastChatByCrewId(Long crewId);
+	Optional<Chat> findLastChatByCrewId(Long crewId, Instant joinTime);
 
 	@Aggregation(pipeline = {
 		"{ '$match': { 'crewId': ?0, 'uuid': ?1, 'entryExitNotice': { '$exists': true } } }",
