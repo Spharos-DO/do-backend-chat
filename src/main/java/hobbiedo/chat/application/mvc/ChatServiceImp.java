@@ -84,8 +84,11 @@ public class ChatServiceImp implements ChatService {
 		return crewIdList.stream()
 			.map(chatStatus -> {
 				Long crewId = chatStatus.getCrewId();
+				Instant joinTime = chatJoinTimeRepository.findJoinTimeByUuidAndCrewId(uuid, crewId)
+					.orElseThrow(() -> new GlobalException(ErrorStatus.NO_EXIST_JOIN_TIME))
+					.getJoinTime();
 				// 채팅방의 마지막 메시지 조회
-				Chat lastChat = chatRepository.findLastChatByCrewId(crewId)
+				Chat lastChat = chatRepository.findLastChatByCrewId(crewId, joinTime)
 					.orElse(newCreateCrewChat(crewId, uuid));
 				String content = lastChat.getImageUrl() != null ? "사진을 보냈습니다." : lastChat.getText();
 				// 안 읽은 메시지 개수 조회
