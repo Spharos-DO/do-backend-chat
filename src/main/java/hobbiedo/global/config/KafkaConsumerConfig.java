@@ -14,7 +14,7 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
-import hobbiedo.chat.kafka.dto.ChatEntryExitDTO;
+import hobbiedo.chat.kafka.dto.CrewEntryExitDTO;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -43,18 +43,18 @@ public class KafkaConsumerConfig {
 	 * @return ConsumerFactory<String, EntryExitDTO>
 	 */
 	@Bean
-	public ConsumerFactory<String, ChatEntryExitDTO> crewEntryExitConsumerFactory() {
+	public ConsumerFactory<String, CrewEntryExitDTO> crewEntryExitConsumerFactory() {
 
 		Map<String, Object> configProps = consumerConfigs();
 		return new DefaultKafkaConsumerFactory<>(configProps, new StringDeserializer(),
-			new JsonDeserializer<>(ChatEntryExitDTO.class, false));
+			new JsonDeserializer<>(CrewEntryExitDTO.class, false));
 	}
 
 	@Bean
-	public ConcurrentKafkaListenerContainerFactory<String, ChatEntryExitDTO>
+	public ConcurrentKafkaListenerContainerFactory<String, CrewEntryExitDTO>
 		crewEntryExitKafkaListenerContainerFactory() {
 
-		ConcurrentKafkaListenerContainerFactory<String, ChatEntryExitDTO> factory =
+		ConcurrentKafkaListenerContainerFactory<String, CrewEntryExitDTO> factory =
 			new ConcurrentKafkaListenerContainerFactory<>();
 
 		factory.setConsumerFactory(crewEntryExitConsumerFactory());

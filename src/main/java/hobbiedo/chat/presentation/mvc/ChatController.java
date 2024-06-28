@@ -38,6 +38,21 @@ public class ChatController {
 		}
 	}
 
+	@Operation(summary = "한 회원의 채팅방 리스트 전체 조회",
+		description = "한 유저에 해당하는 전체 소모임 리스트의 마지막 채팅과 안읽음 개수를 조회한다.")
+	@GetMapping("/latest/list")
+	public BaseResponse<?> getLatestChatList(
+		@RequestHeader(name = "Uuid") String uuid) {
+		try {
+			return BaseResponse.onSuccess(SuccessStatus.FIND_CHAT_LIST,
+				chatService.getChatList(uuid));
+		} catch (GlobalException ex) {
+			return globalExceptionHandler.baseError(ex);
+		} catch (Exception ex) {
+			return globalExceptionHandler.exceptionError(ex);
+		}
+	}
+
 	@Operation(summary = "(특정 소모임) 사진 모아보기", description = "특정 소모임의 이미지 URL이 있는 채팅 내역을 조회한다.")
 	@GetMapping("/image/{crewId}")
 	public BaseResponse<?> getChatsWithImageUrl(@PathVariable Long crewId) {
@@ -51,13 +66,4 @@ public class ChatController {
 		}
 
 	}
-
-	// @Operation(summary = "(채팅방 리스트에서) 마지막 채팅과 안읽음 개수 리스트 조회 (처음)",
-	// 	description = "처음 소모임 리스트를 띄울 때, 한 유저에 해당하는 전체 소모임 리스트의 마지막 채팅과 안읽음 개수를 조회한다.")
-	// @GetMapping("/latest/list")
-	// public BaseResponse<List<LastChatDTO>> getLatestChatList(
-	// 	@RequestHeader(name = "Uuid") String uuid) {
-	// 	return BaseResponse.onSuccess(SuccessStatus.FIND_LAST_CHAT_LIST,
-	// 		chatService.getChatList(uuid));
-	// }
 }
